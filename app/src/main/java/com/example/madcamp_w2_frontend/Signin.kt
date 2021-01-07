@@ -16,7 +16,7 @@ import org.json.JSONObject
 
 class Signin: AppCompatActivity() {
 
-    val url:String = "192.249.18.242:27017"
+    val url:String = "http://192.249.18.242:3000"
     var login_success = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
