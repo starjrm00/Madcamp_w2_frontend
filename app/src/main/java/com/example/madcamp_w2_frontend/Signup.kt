@@ -1,5 +1,6 @@
 package com.example.madcamp_w2_frontend
 
+import android.content.Context
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
@@ -15,7 +16,6 @@ import java.net.MalformedURLException
 import java.net.URL
 
 class Signup:AppCompatActivity() {
-    private var signup_success = false
     private val url:String = "http://192.249.18.212:3000"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,30 +30,24 @@ class Signup:AppCompatActivity() {
 
         btn!!.setOnClickListener{
             try_sign_up(ID.text.toString(), PW.text.toString())
-            if(signup_success){
-                Toast.makeText(applicationContext, "회원가입이 완료되었습니다.", Toast.LENGTH_LONG )
-
-            }
-            else{
-                //실패 메세지 토스트
-            }
             finish()
         }
     }
     fun try_sign_up(id:String, pw:String){
         try {
-            com.example.madcamp_w2_frontend.Signup.JSONTask(id, pw)
-                .execute("http://192.249.18.212:3000/post")
+            com.example.madcamp_w2_frontend.Signup.JSONTask(id, pw, applicationContext)
+                .execute("http://192.249.18.212:3000/signup")
         }catch (e: JSONException) {
             e.printStackTrace()
-            signup_success = false
+            Toast.makeText(applicationContext, "회원가입 실패", Toast.LENGTH_LONG).show()
         }
     }
 
     @Suppress("DEPRECATION")
-    class JSONTask(id: String, pw: String) : AsyncTask<String?, String?, String?>() {
+    class JSONTask(id: String, pw: String, mContext : Context) : AsyncTask<String?, String?, String?>() {
         var id = id
         var pw = pw
+        var mContext = mContext
 
         override fun doInBackground(vararg params: String?): String? {
             try {
@@ -121,7 +115,10 @@ class Signup:AppCompatActivity() {
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
-            Log.i("Signup", "finish!")//서버로 부터 받은 값을 출력해주는 부분
+            if (result == "Success") {
+                Toast.makeText(mContext, "회원가입이 완료되었습니다.", Toast.LENGTH_LONG).show()
+
+            }
         }
     }
 }
