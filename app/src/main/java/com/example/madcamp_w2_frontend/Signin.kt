@@ -18,6 +18,7 @@ import com.android.volley.toolbox.Volley
 import com.facebook.*
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
+import kotlinx.android.synthetic.main.signin.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.*
@@ -29,8 +30,13 @@ import java.util.*
 
 class Signin: AppCompatActivity() {
 
+<<<<<<< HEAD
     val url: String = "http://192.249.18.212:3000"
     var login_success = false
+=======
+    private val url:String = "http://192.249.18.212:3000"
+    private var login_success = false
+>>>>>>> feature/connectSignup
     private var callbackManager: CallbackManager? = null
 
 
@@ -52,6 +58,7 @@ class Signin: AppCompatActivity() {
 
             val intent = Intent(this@Signin, Signup::class.java)
             startActivity(intent)
+            Log.d("touch","finish signup")
         }
 
         callbackManager = CallbackManager.Factory.create()

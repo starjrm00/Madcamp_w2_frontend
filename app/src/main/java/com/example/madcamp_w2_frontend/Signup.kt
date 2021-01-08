@@ -1,8 +1,14 @@
 package com.example.madcamp_w2_frontend
 
+<<<<<<< HEAD
 import android.content.Context
 import android.os.AsyncTask
 import android.os.Bundle
+=======
+import android.content.Intent
+import android.os.Bundle
+import android.os.PersistableBundle
+>>>>>>> feature/connectSignup
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
@@ -16,6 +22,7 @@ import java.net.MalformedURLException
 import java.net.URL
 
 class Signup:AppCompatActivity() {
+    private var signup_success = false
     private val url:String = "http://192.249.18.212:3000"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +37,7 @@ class Signup:AppCompatActivity() {
 
         btn!!.setOnClickListener{
             try_sign_up(ID.text.toString(), PW.text.toString())
+
             finish()
         }
     }
