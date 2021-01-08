@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Madcamp_w2_frontend</string>
+    <string name="facebook_app_id">250275769846485</string>
+    <string name="fb_login_protocol_scheme">fb250275769846485</string>
 </resources>

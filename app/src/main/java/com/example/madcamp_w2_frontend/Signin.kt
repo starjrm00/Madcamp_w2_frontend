@@ -2,24 +2,33 @@ package com.example.madcamp_w2_frontend
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-import com.android.volley.*
+import com.android.volley.DefaultRetryPolicy
+import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.facebook.*
+import com.facebook.login.LoginResult
+import com.facebook.login.widget.LoginButton
 import org.json.JSONException
 import org.json.JSONObject
-import com.facebook.FacebookSdk
-import com.facebook.appevents.AppEventsLogger
+import java.util.*
 
 
 class Signin: AppCompatActivity() {
 
-    val url:String = "http://192.249.18.242:3000"
+    val url:String = "http://192.249.18.212:3000"
     var login_success = false
+    private var callbackManager: CallbackManager? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FacebookSdk.sdkInitialize(this.applicationContext)
         setContentView(R.layout.signin)
 
         val ID = findViewById<EditText>(R.id.text_id)
@@ -38,6 +47,42 @@ class Signin: AppCompatActivity() {
             val intent = Intent(this@Signin, Signup::class.java)
             startActivity(intent)
         }
+
+        callbackManager = CallbackManager.Factory.create()
+
+        val loginButton =
+            findViewById<View>(R.id.facebook_login_btn) as LoginButton
+        loginButton.setReadPermissions(
+            Arrays.asList(
+                "public_profile",
+                "email"
+            )
+        )
+        loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+            override fun onSuccess(loginResult: LoginResult) {
+                val graphRequest = GraphRequest.newMeRequest(
+                    loginResult.accessToken
+                ) { `object`, response -> Log.v("result", `object`.toString()) }
+                val parameters = Bundle()
+                parameters.putString("fields", "id,name,email,gender,birthday")
+                graphRequest.parameters = parameters
+                graphRequest.executeAsync()
+            }
+
+            override fun onCancel() {}
+            override fun onError(error: FacebookException) {
+                Log.e("LoginErr", error.toString())
+            }
+        })
+    }
+
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+        super.onActivityResult(requestCode, resultCode, data)
+        callbackManager?.onActivityResult(requestCode, resultCode, data)
     }
 
     fun login_success(id:String, pw:String) {
