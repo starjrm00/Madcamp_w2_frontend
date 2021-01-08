@@ -12,8 +12,7 @@ class ShowBigImage: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.big_image)
-        var uri:Uri
-        uri = intent.getParcelableExtra("photo" )!!
+        var uri:Uri = intent.getParcelableExtra("photo" )!!
         //item?.photo = Uri.parse(intent.getStringExtra("photo" ))
         iv_detail.setImageURI(uri)
     }

@@ -51,46 +51,42 @@ class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<co
             /* call */
             itemView.iv_call.setOnClickListener {
                 val curPos: Int = adapterPosition
-                var item: list_item = JsonList.get(curPos)
-                val intent_call = Intent(Intent.ACTION_CALL, Uri.parse("tel:" + item.number))
-                startActivity(inflatedView.context, intent_call, Bundle())
+                var item: list_item = JsonList[curPos]
+                startActivity(inflatedView.context, Intent(Intent.ACTION_CALL, Uri.parse("tel:" + item.number)), Bundle())
             }
 
             /* message */
             itemView.iv_mms.setOnClickListener {
                 val curPos: Int = adapterPosition
-                var item: list_item = JsonList.get(curPos)
-                val intent_mms = Intent(Intent.ACTION_VIEW, Uri.parse("tel:" + item.number))
-                startActivity(inflatedView.context, intent_mms, Bundle())
+                var item: list_item = JsonList[curPos]
+                startActivity(inflatedView.context, Intent(Intent.ACTION_VIEW, Uri.parse("tel:" + item.number)), Bundle())
             }
 
             /* delete */
-            itemView.setOnLongClickListener(object : View.OnLongClickListener {
-                override fun onLongClick(view: View?): Boolean {
-                    Log.d("delete", "delete")
-                    val curPos: Int = adapterPosition
-                    //var item: list_item = JsonList.get(curPos)
-                    //다이얼로그 생성
-                    var builder = AlertDialog.Builder(view?.context)
-                    val inflater = LayoutInflater.from(view?.context)
-                    val dialogView = inflater.inflate(R.layout.custom_dialog, null)
-                    val dialogText = dialogView.findViewById<TextView>(R.id.dg_content)
-                    dialogText.setText("${JsonList.get(curPos).name}\n${JsonList.get(curPos).number}\n삭제하시겠습니까?")
-                    builder.setView(dialogView)
-                        .setTitle("연락처 삭제")
-                        //.setMessage(dialogText.text.toString())
-                        .setPositiveButton("OK") { dialogInterface, i ->
-                            //builder.setTitle(dialogText.text.toString())
-                            JsonList.remove(JsonList.get(curPos))
-                            notifyItemRemoved(curPos)
-                            notifyItemRangeChanged(curPos, JsonList.size)
-                        }
-                        .setNegativeButton("CANCEL") { dialogInterface, i ->
-                        }
-                        .show()
-                    return true
-                }
-            })
+            itemView.setOnLongClickListener { view ->
+                Log.d("delete", "delete")
+                val curPos: Int = adapterPosition
+                //var item: list_item = JsonList.get(curPos)
+                //다이얼로그 생성
+                var builder = AlertDialog.Builder(view?.context)
+                val inflater = LayoutInflater.from(view?.context)
+                val dialogView = inflater.inflate(R.layout.custom_dialog, null)
+                val dialogText = dialogView.findViewById<TextView>(R.id.dg_content)
+                dialogText.text = "${JsonList[curPos].name}\n${JsonList[curPos].number}\n삭제하시겠습니까?"
+                builder.setView(dialogView)
+                    .setTitle("연락처 삭제")
+                    //.setMessage(dialogText.text.toString())
+                    .setPositiveButton("OK") { dialogInterface, i ->
+                        //builder.setTitle(dialogText.text.toString())
+                        JsonList.remove(JsonList.get(curPos))
+                        notifyItemRemoved(curPos)
+                        notifyItemRangeChanged(curPos, JsonList.size)
+                    }
+                    .setNegativeButton("CANCEL") { _, _ ->
+                    }
+                    .show()
+                true
+            }
 
         }
     }
@@ -100,8 +96,9 @@ class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<co
         return this.JsonList.size
     }
 
-    override fun onBindViewHolder(holder: contactAdapter.ViewHolder, position: Int) {
-        holder.name.setText((JsonList[position].name))
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        //Log.d("setting recyclerview", "set name = ${JsonList[position].name}, number = ${JsonList[position].number}")
+        holder.name.text = (JsonList[position].name)
         holder.number.text = (JsonList[position].number)
     }
 
@@ -149,12 +146,3 @@ class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<co
             }
         }
     }
-
-
-
-
-
-
-
-
-

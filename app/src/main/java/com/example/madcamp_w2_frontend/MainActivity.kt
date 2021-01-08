@@ -2,8 +2,7 @@ package com.example.madcamp_w2_frontend
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
-import kotlinx.android.synthetic.main.activity_main.*
+import com.example.madcamp_w2_frontend.Second_Page.Fragment2
 import kotlinx.android.synthetic.main.activity_main.tabLayout
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.activity_main.viewPager
@@ -21,4 +20,5 @@ class MainActivity : AppCompatActivity() {
         viewPager.adapter = adapter
         tabLayout.setupWithViewPager(viewPager)
     }
+
 }

@@ -31,7 +31,7 @@ class Fragment1 : Fragment() {
     val list = ArrayList<list_item>()
     //lateinit var adapter:contactAdapter
 
-    lateinit var recyclerView1: RecyclerView
+    lateinit var recyclerView: RecyclerView
     var permissions = arrayOf(android.Manifest.permission.READ_CONTACTS, android.Manifest.permission.CALL_PHONE)
 
     var searchText = ""
@@ -187,14 +187,14 @@ class Fragment1 : Fragment() {
 
     fun setList() {
         //list.addAll(getPhoneNumbers(sortText, searchText))
-        recyclerView1.adapter?.notifyDataSetChanged()
+        recyclerView.adapter?.notifyDataSetChanged()
         //val set_inflater = LayoutInflater.from(context)
-        //val set_View = set_inflater.inflate(R.layout.fragment_a, null)
+        //val set_View = set_inflater.inflate(R.layout.fragment_1, null)
 
-        //recyclerView1 = set_View.findViewById(R.id.rv_json!!)as RecyclerView
-        //recyclerView1.layoutManager = LinearLayoutManager(this.context)
+        //recyclerView = set_View.findViewById(R.id.rv_json!!)as RecyclerView
+        //recyclerView.layoutManager = LinearLayoutManager(this.context)
         //adapter = contactAdapter(list)
-        //recyclerView1.adapter = adapter
+        //recyclerView.adapter = adapter
 
     }
 
@@ -212,17 +212,17 @@ class Fragment1 : Fragment() {
         }
         list.addAll(newList)
 
-        //recyclerView1.adapter = adapter
+        //recyclerView.adapter = adapter
         rv_json.adapter?.notifyDataSetChanged()
         rv_json.setHasFixedSize(true)
 
-        //recyclerView1 = rootView.findViewById(R.id.rv_json!!)as RecyclerView
+        //recyclerView = rootView.findViewById(R.id.rv_json!!)as RecyclerView
         //rv_json.layottManager = LinearLayoutManager(this.context)
-        //recyclerView1.adapter?.notifyDataSetChanged()
+        //recyclerView.adapter?.notifyDataSetChanged()
 
         //adapter 연결
-        //recyclerView1.adapter = contactAdapter(list)
-        //recyclerView1.adapter = FilterAdapter(list)
+        //recyclerView.adapter = contactAdapter(list)
+        //recyclerView.adapter = FilterAdapter(list)
 
         //rv_json.adapter = adapter
         //rv_json.layoutManager = LinearLayoutManager(this.context)
@@ -265,7 +265,7 @@ class Fragment1 : Fragment() {
 
         val cursor = resolver?.query(phoneUri, projections, wheneClause, whereValues, null)
 
-       while(cursor?.moveToNext()?:false) {
+       while(cursor?.moveToNext() == true) {
             val id = cursor?.getString(0).toString()
             val name = cursor?.getString(1).toString()
             var number = cursor?.getString(2).toString()
@@ -310,12 +310,12 @@ class Fragment1 : Fragment() {
     ): View? {
         var rootView =  inflater.inflate(R.layout.fragment_1, container, false)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || isPermitted()) {
-            recyclerView1 = rootView.findViewById(R.id.rv_json!!)as RecyclerView
-            recyclerView1.layoutManager = LinearLayoutManager(this.context)
+            recyclerView = rootView.findViewById(R.id.rv_json!!)as RecyclerView
+            recyclerView.layoutManager = LinearLayoutManager(this.context)
             list.addAll(getPhoneNumbers(sortText, searchText))
             //adapter 연결
-            recyclerView1.adapter = contactAdapter(list)
-            recyclerView1.setHasFixedSize(true)
+            recyclerView.adapter = contactAdapter(list)
+            recyclerView.setHasFixedSize(true)
             startProcess()
         } else {
             ActivityCompat.requestPermissions(this.requireActivity(), permissions, 99)

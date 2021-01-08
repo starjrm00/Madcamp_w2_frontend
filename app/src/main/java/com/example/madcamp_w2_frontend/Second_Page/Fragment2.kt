@@ -1,4 +1,4 @@
-package com.example.madcamp_w2_frontend
+package com.example.madcamp_w2_frontend.Second_Page
 
 import android.app.Activity.RESULT_OK
 import android.content.Context
@@ -16,7 +16,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.madcamp_w2_frontend.ImageAdapter
 import com.example.madcamp_w2_frontend.R
+import com.example.madcamp_w2_frontend.image_item
 import kotlinx.android.synthetic.main.fragment_2.*
 import java.io.ByteArrayOutputStream
 

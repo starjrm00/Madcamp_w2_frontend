@@ -22,50 +22,45 @@ class ImageAdapter(val imageList:ArrayList<image_item>):
         val view = LayoutInflater.from(parent.context).inflate(R.layout.image_item, parent, false)
 
         return viewHolder(view).apply{
-            itemView.setOnClickListener(object:View.OnClickListener{
-                override fun onClick(v: View?) {
-                    val curPos: Int = adapterPosition
-                    var item: image_item = imageList.get(curPos)
-                    var intent: Intent = Intent(v?.context, ShowBigImage::class.java)
-                    intent.putExtra("photo", item.photo)
-                    Log.d("putExtra", intent.putExtra("photo", item.photo).toString())
+            itemView.setOnClickListener { v ->
+                val curPos: Int = adapterPosition
+                var item: image_item = imageList.get(curPos)
+                var intent = Intent(v?.context, ShowBigImage::class.java)
+                intent.putExtra("photo", item.photo)
+                Log.d("putExtra", intent.putExtra("photo", item.photo).toString())
 
-                    v?.context?.startActivity(intent)
-                }
-            })
+                v?.context?.startActivity(intent)
+            }
 
-            itemView.setOnLongClickListener(object : View.OnLongClickListener {
+            itemView.setOnLongClickListener { view ->
+                val curPos: Int = adapterPosition
+                var image: image_item = imageList[curPos]
 
-                override fun onLongClick(view: View?): Boolean {
-                    val curPos: Int = adapterPosition
-                    var image: image_item = imageList.get(curPos)
-
-                    //다이얼로그 생성
-                    var builder = AlertDialog.Builder(view?.context)
-                    val inflater = LayoutInflater.from(view?.context)
-                    val dialogView = inflater.inflate(R.layout.custom_dialog, null)
-                    val dialogText = dialogView.findViewById<TextView>(R.id.dg_content)
-                    dialogText.setText("이미지를 삭제하시겠습니까?")
-                    builder.setView(dialogView)
-                        .setTitle("이미지 삭제")
-                        .setPositiveButton("확인") { dialogInterface, i ->
-                            builder.setTitle(dialogText.text.toString())
-                            imageList.remove(imageList.get(curPos))
-                            notifyItemRemoved(curPos)
-                            notifyItemRangeChanged(curPos,imageList.size)
-                        }
-                        .setNegativeButton("취소") { dialogInterface, i ->
-                        }
-                        .show()
-                    return true
-                }
-            })
+                //다이얼로그 생성
+                var builder = AlertDialog.Builder(view?.context)
+                val inflater = LayoutInflater.from(view?.context)
+                val dialogView = inflater.inflate(R.layout.custom_dialog, null)
+                val dialogText = dialogView.findViewById<TextView>(R.id.dg_content)
+                dialogText.setText("이미지를 삭제하시겠습니까?")
+                builder.setView(dialogView)
+                    .setTitle("이미지 삭제")
+                    .setPositiveButton("확인") { dialogInterface, i ->
+                        builder.setTitle(dialogText.text.toString())
+                        imageList.remove(imageList.get(curPos))
+                        notifyItemRemoved(curPos)
+                        notifyItemRangeChanged(curPos, imageList.size)
+                    }
+                    .setNegativeButton("취소") { dialogInterface, i ->
+                    }
+                    .show()
+                true
+            }
         }
     }
 
 
     override fun onBindViewHolder(holder: viewHolder, position: Int) {
-            holder.image?.setImageURI(imageList.get(position).photo)
+            holder.image?.setImageURI(imageList[position].photo)
     }
 
     override fun getItemCount(): Int {

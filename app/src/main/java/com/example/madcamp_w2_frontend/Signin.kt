@@ -18,6 +18,8 @@ import com.android.volley.toolbox.Volley
 import com.facebook.*
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.TedPermission
 import kotlinx.android.synthetic.main.signin.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -82,6 +84,7 @@ class Signin: AppCompatActivity() {
                 Log.e("LoginErr", error.toString())
             }
         })
+        getPermission()
     }
 
     override fun onActivityResult(
@@ -188,5 +191,23 @@ class Signin: AppCompatActivity() {
                 startActivity(mContext, intent, null)
             }
         }
+    }
+    private fun getPermission() {
+        var permission: PermissionListener = object: PermissionListener {
+            override fun onPermissionGranted() {
+                Toast.makeText(applicationContext,"권한이 허용되었습니다", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+                Toast.makeText(applicationContext,"권한이 거부되었습니다", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        TedPermission.with(this)
+            .setPermissionListener(permission)
+            .setRationaleMessage("카메라 사용을 위해 권한을 허용해주세요")
+            .setDeniedMessage("권한을 거부하였습니다.")
+            .setPermissions(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.CAMERA, android.Manifest.permission.CALL_PHONE, android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.READ_CONTACTS, android.Manifest.permission.WRITE_CONTACTS)
+            .check()
     }
 }
