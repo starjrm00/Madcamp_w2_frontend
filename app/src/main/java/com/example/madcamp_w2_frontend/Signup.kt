@@ -1,7 +1,9 @@
 package com.example.madcamp_w2_frontend
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -13,10 +15,12 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class Signup:AppCompatActivity() {
-    var signup_success = false
-    val url:String = "http://192.249.18.242:3000"
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    private var signup_success = false
+    private val url:String = "http://192.249.18.212:3000"
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("onCreate", "signup oncreate")
+        var intent = getIntent()
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.signup)
         val ID = findViewById<EditText>(R.id.Signup_id)
         val PW = findViewById<EditText>(R.id.Signup_pw)
@@ -29,7 +33,6 @@ class Signup:AppCompatActivity() {
             else{
                 //실패 메세지 토스트
             }
-            finish()
         }
     }
     fun try_sign_up(id:String, pw:String){

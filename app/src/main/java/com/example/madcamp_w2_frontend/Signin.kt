@@ -21,8 +21,8 @@ import java.util.*
 
 class Signin: AppCompatActivity() {
 
-    val url:String = "http://192.249.18.212:3000"
-    var login_success = false
+    private val url:String = "http://192.249.18.212:3000"
+    private var login_success = false
     private var callbackManager: CallbackManager? = null
 
 
@@ -36,16 +36,20 @@ class Signin: AppCompatActivity() {
 
         val btn_sign_in = findViewById<Button>(R.id.btn_signin)
         btn_sign_in!!.setOnClickListener {
+            Log.d("touch", "try login")
             login_success(ID.text.toString(), PW.text.toString())
             if(login_success) {
-                val intent = Intent(this@Signin, MainActivity::class.java)
+                val intent = Intent(applicationContext, MainActivity::class.java)
                 startActivity(intent)
             }
         }
         val btn_sign_up = findViewById<Button>(R.id.btn_signup)
         btn_sign_up!!.setOnClickListener {
-            val intent = Intent(this@Signin, Signup::class.java)
+            Log.d("touch", "try signup")
+            val intent = Intent(applicationContext, Signup::class.java)
+            Log.d("touch", intent.toString())
             startActivity(intent)
+            Log.d("touch","finish signup")
         }
 
         callbackManager = CallbackManager.Factory.create()
