@@ -14,6 +14,7 @@ import com.android.volley.toolbox.Volley
 import com.facebook.*
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
+import kotlinx.android.synthetic.main.signin.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
@@ -34,8 +35,7 @@ class Signin: AppCompatActivity() {
         val ID = findViewById<EditText>(R.id.text_id)
         val PW = findViewById<EditText>(R.id.text_pw)
 
-        val btn_sign_in = findViewById<Button>(R.id.btn_signin)
-        btn_sign_in!!.setOnClickListener {
+        btn_signin!!.setOnClickListener {
             Log.d("touch", "try login")
             login_success(ID.text.toString(), PW.text.toString())
             if(login_success) {
@@ -43,8 +43,8 @@ class Signin: AppCompatActivity() {
                 startActivity(intent)
             }
         }
-        val btn_sign_up = findViewById<Button>(R.id.btn_signup)
-        btn_sign_up!!.setOnClickListener {
+
+        btn_signup!!.setOnClickListener {
             Log.d("touch", "try signup")
             val intent = Intent(applicationContext, Signup::class.java)
             Log.d("touch", intent.toString())
