@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startActivity
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
@@ -43,11 +44,9 @@ class Signin: AppCompatActivity() {
 
         val btn_sign_in = findViewById<Button>(R.id.btn_signin)
         btn_sign_in!!.setOnClickListener {
-            if (try_login(ID.text.toString(), PW.text.toString())) {
-                val intent = Intent(this@Signin, MainActivity::class.java)
-                startActivity(intent)
-            }
+            try_login(ID.text.toString(), PW.text.toString())
         }
+
         val btn_sign_up = findViewById<Button>(R.id.btn_signup)
         btn_sign_up!!.setOnClickListener {
 
@@ -182,6 +181,9 @@ class Signin: AppCompatActivity() {
             if (result == "Success") {
                 success = true
                 Toast.makeText(mContext, "로그인 성공", Toast.LENGTH_LONG).show()
+                val intent = Intent(mContext, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(mContext, intent, null)
             }
         }
     }
