@@ -1,4 +1,4 @@
-package com.example.madcamp_w2_frontend.Second_Page
+package com.example.madcamp_w2_frontend
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.madcamp_w2_frontend.R
 
 class ImageAdapter(val imageList:ArrayList<image_item>):
     RecyclerView.Adapter<ImageAdapter.viewHolder>(){

@@ -1,14 +1,8 @@
 package com.example.madcamp_w2_frontend
 
-<<<<<<< HEAD
 import android.content.Context
 import android.os.AsyncTask
 import android.os.Bundle
-=======
-import android.content.Intent
-import android.os.Bundle
-import android.os.PersistableBundle
->>>>>>> feature/connectSignup
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText

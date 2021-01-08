@@ -1,4 +1,4 @@
-package com.example.madcamp_w2_frontend.First_Page
+package com.example.madcamp_w2_frontend
 
 
 import android.app.Dialog
@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -24,7 +23,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_a.*
+import com.example.madcamp_w2_frontend.R
+import kotlinx.android.synthetic.main.fragment_1.*
 import org.json.JSONObject
 
 class Fragment1 : Fragment() {
@@ -308,7 +308,7 @@ class Fragment1 : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        var rootView =  inflater.inflate(R.layout.fragment_a, container, false)
+        var rootView =  inflater.inflate(R.layout.fragment_1, container, false)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || isPermitted()) {
             recyclerView1 = rootView.findViewById(R.id.rv_json!!)as RecyclerView
             recyclerView1.layoutManager = LinearLayoutManager(this.context)

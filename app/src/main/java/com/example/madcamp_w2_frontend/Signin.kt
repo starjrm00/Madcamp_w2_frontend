@@ -30,13 +30,8 @@ import java.util.*
 
 class Signin: AppCompatActivity() {
 
-<<<<<<< HEAD
     val url: String = "http://192.249.18.212:3000"
     var login_success = false
-=======
-    private val url:String = "http://192.249.18.212:3000"
-    private var login_success = false
->>>>>>> feature/connectSignup
     private var callbackManager: CallbackManager? = null
 
 

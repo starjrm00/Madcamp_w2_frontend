@@ -1,50 +1,13 @@
-package com.example.madcamp_w2_frontend.Third_Page
+package com.example.madcamp_w2_frontend
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.app.AlertDialog
-import android.content.Context
-import android.content.DialogInterface
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import android.location.Address
-import android.location.Geocoder
-import android.location.Location
-import android.location.LocationManager
-import android.os.Bundle
-import android.os.Looper
-import android.provider.Settings
-import android.util.Log
-import android.view.View
-import android.view.WindowManager
-import android.widget.Toast
-import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.example.android1.R
-import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.googlemaplayer.*
-import noman.googleplaces.Place
-import noman.googleplaces.PlacesException
 import noman.googleplaces.PlacesListener
-import org.json.JSONObject
-import org.jsoup.Jsoup
-import java.io.IOException
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
 
 
-class MapActivity: AppCompatActivity(), OnMapReadyCallback, PlacesListener, ActivityCompat.OnRequestPermissionsResultCallback {
+class MapActivity: AppCompatActivity(){//, OnMapReadyCallback, PlacesListener, ActivityCompat.OnRequestPermissionsResultCallback {
+    /*
     //private lateinit var fusedLocationClient: FusedLocationProviderClient
     var previous_marker: ArrayList<Marker>? = null
     var nearRestaurant:JSONObject? = null
@@ -658,4 +621,5 @@ class MapActivity: AppCompatActivity(), OnMapReadyCallback, PlacesListener, Acti
 
     override fun onPlacesStart() {
     }
+     */
 }

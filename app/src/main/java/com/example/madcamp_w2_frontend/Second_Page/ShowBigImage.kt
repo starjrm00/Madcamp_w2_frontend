@@ -1,10 +1,11 @@
-package com.example.madcamp_w2_frontend.Second_Page
+package com.example.madcamp_w2_frontend
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
+import com.example.madcamp_w2_frontend.R
 import kotlinx.android.synthetic.main.big_image.*
 
 class ShowBigImage: AppCompatActivity() {

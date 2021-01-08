@@ -1,12 +1,9 @@
-package com.example.madcamp_w2_frontend.First_Page
+package com.example.madcamp_w2_frontend
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,17 +11,10 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_a.view.*
+import com.example.madcamp_w2_frontend.R
 import kotlinx.android.synthetic.main.list_item.view.*
-import java.io.InputStream
-import java.nio.channels.AsynchronousFileChannel.open
-import java.nio.channels.Pipe.open
 import java.util.*
 class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<contactAdapter.ViewHolder>(), Filterable{
 
