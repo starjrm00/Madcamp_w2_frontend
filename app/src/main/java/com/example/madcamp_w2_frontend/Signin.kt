@@ -1,18 +1,18 @@
 package com.example.madcamp_w2_frontend
 
 import android.content.Intent
-import android.os.AsyncTask
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONException
 import org.json.JSONObject
+import com.facebook.FacebookSdk
+import com.facebook.appevents.AppEventsLogger
+
 
 class Signin: AppCompatActivity() {
 
@@ -45,6 +45,7 @@ class Signin: AppCompatActivity() {
 
             var json = JSONObject()
             //입력해둔 edittext의 id와 pw값을 받아와 put해줍니다 : 데이터를 json형식으로 바꿔 넣어주었습니다.
+            json.put("request", "signin")
             json.put("id", id)
             json.put("password", pw)
             val jsonString = json.toString() //완성된 json 포맷

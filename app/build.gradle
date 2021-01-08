@@ -7,6 +7,10 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
+    repositories {
+        mavenCentral()
+    }
+
     defaultConfig {
         applicationId "com.example.madcamp_w2_frontend"
         minSdkVersion 16
@@ -44,4 +48,5 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation 'com.facebook.android:facebook-android-sdk:[4,5)'
 }
