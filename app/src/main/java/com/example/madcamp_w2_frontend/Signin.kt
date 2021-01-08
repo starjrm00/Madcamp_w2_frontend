@@ -44,6 +44,7 @@ class Signin: AppCompatActivity() {
         }
         val btn_sign_up = findViewById<Button>(R.id.btn_signup)
         btn_sign_up!!.setOnClickListener {
+
             val intent = Intent(this@Signin, Signup::class.java)
             startActivity(intent)
         }
@@ -98,7 +99,7 @@ class Signin: AppCompatActivity() {
             //이제 전송해볼까요?
             val requestQueue = Volley.newRequestQueue(this@Signin)
             val jsonObjectRequest =
-                    JsonObjectRequest(Request.Method.POST, url, json, { response ->
+                    JsonObjectRequest(Request.Method.GET, url, json, { response ->
 
                         //데이터 전달을 끝내고 이제 그 응답을 받을 차례입니다.
                         try {
