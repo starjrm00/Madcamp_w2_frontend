@@ -15,10 +15,11 @@ android {
 
     defaultConfig {
         applicationId "com.example.madcamp_w2_frontend"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

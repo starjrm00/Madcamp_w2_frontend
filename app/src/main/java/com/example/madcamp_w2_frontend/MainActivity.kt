@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.tabLayout
+import kotlinx.android.synthetic.main.activity_main.view.*
+import kotlinx.android.synthetic.main.activity_main.viewPager
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,6 +19,6 @@ class MainActivity : AppCompatActivity() {
         adapter.addFragment(Fragment3(), "Tab3")
 
         viewPager.adapter = adapter
-        tabLayout.setupWithViewpager(viewPager)
+        tabLayout.setupWithViewPager(viewPager)
     }
 }
