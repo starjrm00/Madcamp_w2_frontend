@@ -16,6 +16,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.beust.klaxon.json
 import com.example.madcamp_w2_frontend.R
 import kotlinx.android.synthetic.main.list_item.view.*
 import org.json.JSONObject
@@ -25,12 +26,13 @@ import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
-class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<contactAdapter.ViewHolder>(), Filterable{
+class contactAdapter(val JsonList:ArrayList<list_item>, UniqueID:String): RecyclerView.Adapter<contactAdapter.ViewHolder>(), Filterable{
 
 
     private var filteredList: ArrayList<list_item> = JsonList
     private var unfilterList: ArrayList<list_item> = JsonList
     val serverip = "http://192.249.18.242:3000"
+    val UniqueID = UniqueID
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var name = itemView.tv_name
@@ -84,7 +86,7 @@ class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<co
                     //.setMessage(dialogText.text.toString())
                     .setPositiveButton("OK") { _, _ ->
                         //builder.setTitle(dialogText.text.toString())
-                        var jsonTask = JSONTask_delete_contact(JsonList[curPos], parent.context)
+                        var jsonTask = JSONTask_delete_contact(JsonList[curPos], parent.context, UniqueID)
                         jsonTask.execute(serverip+"/delete_contact")
                         JsonList.remove(JsonList[curPos])
                         notifyItemRemoved(curPos)
@@ -157,12 +159,14 @@ class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<co
     }
 
     @Suppress("DEPRECATION")
-    class JSONTask_delete_contact(item: list_item, mContext : Context) : AsyncTask<String?, String?, String>(){
+    class JSONTask_delete_contact(item: list_item, mContext : Context, UniqueID: String) : AsyncTask<String?, String?, String>(){
         var item = item
         var mContext = mContext
+        var UniqueID = UniqueID
         override fun doInBackground(vararg params: String?): String? {
             try{
                 var jsonObject = JSONObject()
+                jsonObject.accumulate("_id", UniqueID)
                 jsonObject.accumulate("name", item.name)
                 jsonObject.accumulate("number", item.number)
                 var con: HttpURLConnection? = null

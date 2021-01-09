@@ -1,7 +1,6 @@
 package com.example.madcamp_w2_frontend
 
 
-import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.pm.PackageManager
@@ -33,9 +32,8 @@ import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
-import java.nio.Buffer
 
-class Fragment1 : Fragment() {
+class Fragment1(UniqueID: String) : Fragment() {
     val list = ArrayList<list_item>()
     //lateinit var adapter:contactAdapter
     lateinit var recyclerView: RecyclerView
@@ -46,6 +44,7 @@ class Fragment1 : Fragment() {
     var serach:CharSequence = ""
 
     val serverip = "http://192.249.18.242:3000"
+    val UniqueID = UniqueID
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,7 +57,7 @@ class Fragment1 : Fragment() {
             recyclerView.layoutManager = LinearLayoutManager(this.context)
             list.addAll(getPhoneNumbers(sortText, searchText))
             //adapter 연결
-            recyclerView.adapter = contactAdapter(list)
+            recyclerView.adapter = contactAdapter(list, UniqueID)
             recyclerView.setHasFixedSize(true)
             startProcess()
         } else {
@@ -117,14 +116,14 @@ class Fragment1 : Fragment() {
                         Log.d("dialogName", dialogName)
                         Log.d("dialogNumber", dialogNumber)
                         if (dialogName.isNotEmpty() && dialogNumber.isNotEmpty()) {
-                            var jsonTask = JSONTask_add_contact(list_item(id, dialogName, dialogNumber), view.context)
+                            var jsonTask = JSONTask_add_contact(list_item(id, dialogName, dialogNumber), view.context, UniqueID)
                             jsonTask.execute(serverip+"/add_contact")
                             list.add(list_item(id, dialogName, dialogNumber))
                             for(i in list) {
                                 Log.d("dialogName_dialogNumber", i.name + i.number)
                             }
                             dilaog01.dismiss()
-                            contactAdapter(list).notifyItemInserted(0);
+                            contactAdapter(list, UniqueID).notifyItemInserted(0);
                             //refreshFragment(this, parentFragmentManager)
 
                             Log.d("get_load_add", "get_load_add_button")
@@ -179,7 +178,7 @@ class Fragment1 : Fragment() {
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 //val ctAdapter = contactAdapter(list)
-                contactAdapter(list).getFilter().filter(s)
+                contactAdapter(list, UniqueID).getFilter().filter(s)
                 serach = s
                 Log.d("serach", serach.toString())
                 searchText = s.toString()
@@ -262,7 +261,7 @@ class Fragment1 : Fragment() {
     }
 
     fun makePhoneList(sort:String, searchName:String) {
-        var jsonTask = JSONTask_get_contact(requireContext())
+        var jsonTask = JSONTask_get_contact(requireContext(), UniqueID)
         jsonTask.execute(serverip+"/get_contact")
     }
 
@@ -275,21 +274,22 @@ class Fragment1 : Fragment() {
 
         val list = ArrayList<list_item>()
         val phoneUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
-        Log.d("phoneUri",phoneUri.toString() )
-        val projections = arrayOf(ContactsContract.CommonDataKinds.Phone.CONTACT_ID
-                , ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
-                , ContactsContract.CommonDataKinds.Phone.NUMBER)
-
+        Log.d("phoneUri", phoneUri.toString())
+        val projections = arrayOf(
+            ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+            ContactsContract.CommonDataKinds.Phone.NUMBER
+        )
 
 
         val resolver = activity?.contentResolver
-        var wheneClause:String? = null
+        var wheneClause: String? = null
 
         val optionSort = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
         var whereValues = arrayOf<String>()
         //var whereValues: Array<String>
         Log.d("searchName", searchName)
-        if(searchName.isNotEmpty() ?: false) {
+        if (searchName.isNotEmpty() ?: false) {
             wheneClause = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " like ?"
             whereValues = arrayOf("%$searchName%")
 
@@ -302,20 +302,20 @@ class Fragment1 : Fragment() {
 
         val cursor = resolver?.query(phoneUri, projections, wheneClause, whereValues, null)
 
-       while(cursor?.moveToNext() == true) {
+        while (cursor?.moveToNext() == true) {
             val id = cursor?.getString(0).toString()
             val name = cursor?.getString(1).toString()
             var number = cursor?.getString(2).toString()
-           Log.d("name", name)
-           Log.d("number", number)
+            Log.d("name", name)
+            Log.d("number", number)
             // json 파일에 넣기
             val main = JSONObject(jsonString)
-           jObject.put("person",main)
-           main.put("id", id)
-           main.put("name", name)
-           main.put("number", number)
+            jObject.put("person", main)
+            main.put("id", id)
+            main.put("name", name)
+            main.put("number", number)
 
-           //넣은 값을 불러와서 list item 에 부여
+            //넣은 값을 불러와서 list item 에 부여
             for (i in 0 until jObject.length()) {
                 //var jArray = jObject.getJSONArray("person")
                 val obj = jObject.getJSONObject("person")
@@ -329,7 +329,6 @@ class Fragment1 : Fragment() {
         }
         return list
     }
-
     @RequiresApi(Build.VERSION_CODES.M)
     fun isPermitted():Boolean {
         for(perm in permissions) {
@@ -351,14 +350,14 @@ class Fragment1 : Fragment() {
     }
 
     @Suppress("DEPRECATION")
-    class JSONTask_add_contact(item: list_item, mContext : Context) : AsyncTask<String?, String?, String>(){
+    class JSONTask_add_contact(item: list_item, mContext : Context, UniqueID: String) : AsyncTask<String?, String?, String>(){
         var item = item
         var mContext = mContext
+        var UniqueID = UniqueID
         override fun doInBackground(vararg params: String?): String? {
             try{
                 var jsonObject = JSONObject()
-                var activity:Activity
-                jsonObject.accumulate("_id", (activity as MainActivity?)!!.UniqueID)
+                jsonObject.accumulate("_id", UniqueID)
                 jsonObject.accumulate("name", item.name)
                 jsonObject.accumulate("number", item.number)
                 var con: HttpURLConnection? = null
@@ -424,8 +423,9 @@ class Fragment1 : Fragment() {
     }
 
     @Suppress("DEPRECATION")
-    class JSONTask_get_contact(mContext : Context) : AsyncTask<String?, String?, String>(){
+    class JSONTask_get_contact(mContext : Context, UniqueID: String) : AsyncTask<String?, String?, String>(){
         var mContext = mContext
+        var UniqueID = UniqueID
         override fun doInBackground(vararg params: String?): String? {
             try{
                 var jsonObject = JSONObject()

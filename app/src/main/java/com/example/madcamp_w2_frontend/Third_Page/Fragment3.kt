@@ -12,7 +12,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import kotlinx.android.synthetic.main.fragment_3.*
 
 
-class Fragment3 : Fragment(), OnMapReadyCallback {
+class Fragment3(UniqueID:String) : Fragment(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
