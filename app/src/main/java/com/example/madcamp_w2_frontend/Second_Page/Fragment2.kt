@@ -4,14 +4,17 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
-
 import android.os.Bundle
 import android.provider.MediaStore
-import androidx.fragment.app.Fragment
+import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.GridLayoutManager
@@ -22,36 +25,44 @@ import com.example.madcamp_w2_frontend.image_item
 import kotlinx.android.synthetic.main.fragment_2.*
 import java.io.ByteArrayOutputStream
 
-class Fragment2 : Fragment() {
+
+class Fragment2(UniqueID: String) : Fragment() {
     lateinit var recyclerView2 : RecyclerView
     val image_list = ArrayList<image_item>()
     private val pickImage = 100
     private val capturePhoto = 101
     private var imageUri:Uri? = null
+    var isFabOpen = false
+    val UniqueID = UniqueID
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val rootView = inflater.inflate(R.layout.fragment_2, container, false)
+        recyclerView2 = rootView.findViewById(R.id.rv_image)as RecyclerView
+        recyclerView2.layoutManager = GridLayoutManager(this.context,3)
+        image_list = getImageFromDB()
+        recyclerView2.adapter = ImageAdapter(image_list)
+        recyclerView2.setHasFixedSize(true)
+        return rootView
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
+        image_add_button.setOnClickListener {
+            toggleFab()
+        }
         btn_camera.setOnClickListener{
+            toggleFab()
             takePicture()
         }
 
         btn_gallery.setOnClickListener{
+            toggleFab()
             loadImage()
         }
-    }
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_2, container, false)
-        recyclerView2 = rootView.findViewById(R.id.rv_image!!)as RecyclerView
-        recyclerView2.layoutManager = GridLayoutManager(this.context,3)
-        recyclerView2.adapter = ImageAdapter(image_list)
-        recyclerView2.setHasFixedSize(true)
-        return rootView
     }
 
     private fun loadImage(){
@@ -66,6 +77,7 @@ class Fragment2 : Fragment() {
             /* gallery load */
             if (requestCode == pickImage) {
                 imageUri = data?.data
+                saveImageinMongod(imageUri)
                 image_list.add(image_item(imageUri))
             }
             /* camera load */
@@ -73,6 +85,7 @@ class Fragment2 : Fragment() {
                 var bundle: Bundle? = data?.getExtras()
                 var bitmap: Bitmap = bundle?.get("data") as Bitmap
                 var changedUri: Uri = BitmapToUri(this.requireContext(), bitmap)
+                saveImageinMongod(changedUri)
                 image_list.add(image_item(changedUri))
             }
 
@@ -94,5 +107,65 @@ class Fragment2 : Fragment() {
     fun refreshFragment(fragment: Fragment, fragmentManager: FragmentManager){
         var ft: FragmentTransaction = fragmentManager.beginTransaction()
         ft.detach(fragment).attach(fragment).commit()
+    }
+
+    fun toggleFab() {
+        if (isFabOpen) {
+            val fab_close = AnimationUtils.loadAnimation(context, R.anim.fab_close)
+
+            image_add_button.setImageResource(R.drawable.ic_baseline_add_24)
+            btn_camera.startAnimation(fab_close)
+            btn_gallery.startAnimation(fab_close)
+            btn_camera.setClickable(false)
+            btn_gallery.setClickable(false)
+            isFabOpen = false
+        } else {
+            val fab_open = AnimationUtils.loadAnimation(context, R.anim.fab_open)
+
+            image_add_button.setImageResource(R.drawable.ic_baseline_close_24)
+            btn_camera.startAnimation(fab_open)
+            btn_gallery.startAnimation(fab_open)
+            btn_camera.setClickable(true)
+            btn_gallery.setClickable(true)
+            isFabOpen = true
+        }
+    }
+
+    fun saveImageinMongod(uri : Uri?) {
+        val bitmap : Bitmap =
+            MediaStore.Images.Media.getBitmap(context?.contentResolver, uri)
+        val bitmapString : String? = BitmapToString(bitmap)
+        var jsonTask = com.example.madcamp_w2_frontend.SaveImage.JSONTask(bitmapString, UniqueID, context)
+        Log.d("try_login", "let's execute jsonTask")
+        jsonTask.execute("http://192.249.18.212:3000/saveImage")
+    }
+
+    fun BitmapToString(bitmap: Bitmap): String? {
+        val baos =
+            ByteArrayOutputStream() //바이트 배열을 차례대로 읽어 들이기위한 ByteArrayOutputStream클래스 선언
+        bitmap.compress(Bitmap.CompressFormat.PNG, 70, baos) //bitmap을 압축 (숫자 70은 70%로 압축한다는 뜻)
+        val bytes = baos.toByteArray() //해당 bitmap을 byte배열로 바꿔준다.
+        return Base64.encodeToString(bytes, Base64.DEFAULT) //String을 retrurn
+    }
+
+    fun StringToBitmap(encodedString: String?): Bitmap? {
+        return try {
+            val encodeByte = Base64.decode(
+                encodedString,
+                Base64.DEFAULT
+            ) // String 화 된 이미지를  base64방식으로 인코딩하여 byte배열을 만듬
+            BitmapFactory.decodeByteArray(
+                encodeByte,
+                0,
+                encodeByte.size
+            ) //만들어진 bitmap을 return
+        } catch (e: Exception) {
+            e.message
+            null
+        }
+    }
+
+    fun getImageFromDB() : ArrayList<image_item> {
+        //TODO 이미지 가져오기
     }
 }

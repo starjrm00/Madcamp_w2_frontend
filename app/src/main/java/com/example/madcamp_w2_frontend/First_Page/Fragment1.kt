@@ -26,11 +26,12 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_1.*
 import org.json.JSONObject
 
-class Fragment1 : Fragment() {
+class Fragment1(UniqueID: String) : Fragment() {
     val list = ArrayList<list_item>()
     //lateinit var adapter:contactAdapter
 
     lateinit var recyclerView: RecyclerView
+    lateinit var rootView : View
     var permissions = arrayOf(android.Manifest.permission.READ_CONTACTS, android.Manifest.permission.CALL_PHONE)
 
     var searchText = ""
@@ -42,7 +43,7 @@ class Fragment1 : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        var rootView =  inflater.inflate(R.layout.fragment_1, container, false)
+        rootView =  inflater.inflate(R.layout.fragment_1, container, false)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || isPermitted()) {
             recyclerView = rootView.findViewById(R.id.rv_json!!)as RecyclerView
             recyclerView.layoutManager = LinearLayoutManager(this.context)
