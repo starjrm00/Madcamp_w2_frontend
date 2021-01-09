@@ -55,15 +55,13 @@ class Signin: AppCompatActivity() {
 
         callbackManager = CallbackManager.Factory.create()
 
-        val loginButton =
-            findViewById<View>(R.id.facebook_login_btn) as LoginButton
-        loginButton.setReadPermissions(
+        facebook_login_btn.setReadPermissions(
             Arrays.asList(
                 "public_profile",
                 "email"
             )
         )
-        loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+        facebook_login_btn.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
             override fun onSuccess(loginResult: LoginResult) {
                 var accessToken = loginResult.accessToken
 
@@ -72,7 +70,7 @@ class Signin: AppCompatActivity() {
                     loginResult.accessToken
                 ) { `object`, response ->
                     var userName = `object`.get("name") as String
-                    com.example.madcamp_w2_frontend.FacebookAccess.JSONTask(accessToken.userId, userName)
+                    FacebookAccess.JSONTask(accessToken.userId, userName)
                         .execute("http://192.249.18.212:3000/facebookLogin")
                 }
                 val parameters = Bundle()

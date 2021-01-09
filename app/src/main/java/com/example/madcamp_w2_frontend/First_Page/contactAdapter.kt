@@ -85,7 +85,6 @@ class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<co
                     .show()
                 true
             }
-
         }
     }
 
