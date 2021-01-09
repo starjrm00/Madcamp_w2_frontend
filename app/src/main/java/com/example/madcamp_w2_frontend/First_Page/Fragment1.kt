@@ -2,7 +2,9 @@ package com.example.madcamp_w2_frontend
 
 
 import android.app.Dialog
+import android.content.Context
 import android.content.pm.PackageManager
+import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
@@ -25,6 +27,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_1.*
 import org.json.JSONObject
+import java.io.*
+import java.lang.Exception
+import java.net.HttpURLConnection
+import java.net.MalformedURLException
+import java.net.URL
+import java.nio.Buffer
 
 class Fragment1 : Fragment() {
     val list = ArrayList<list_item>()
@@ -106,7 +114,9 @@ class Fragment1 : Fragment() {
                         val dialogNumber = dialogView?.findViewById<TextView>(R.id.addNumber_)?.text.toString()
                         Log.d("dialogName", dialogName)
                         Log.d("dialogNumber", dialogNumber)
-                       // if (dialogName.isNotEmpty() && dialogNumber.isNotEmpty()) {
+                        if (dialogName.isNotEmpty() && dialogNumber.isNotEmpty()) {
+                            var jsonTask = JSONTask_send_contact(list_item(id, dialogName, dialogNumber), view.context)
+                            jsonTask.execute("http://192.249.18.212:3000/connect_contact")
                             list.add(list_item(id, dialogName, dialogNumber))
                             for(i in list) {
                                 Log.d("dialogName_dialogNumber", i.name + i.number)
@@ -116,7 +126,7 @@ class Fragment1 : Fragment() {
                             //refreshFragment(this, parentFragmentManager)
 
                             Log.d("get_load_add", "get_load_add_button")
-                        //}
+                        }
 
                         Log.d("get_load_add", "get_load_add_button")
 
@@ -331,6 +341,77 @@ class Fragment1 : Fragment() {
         var ft: FragmentTransaction = fragmentManager.beginTransaction()
         ft.detach(fragment).attach(fragment).commit()
         Log.v("dialog", "Do refresh")
+    }
+
+    @Suppress("DEPRECATION")
+    class JSONTask_send_contact(item: list_item, mContext : Context) : AsyncTask<String?, String?, String>(){
+        var item = item
+        var mContext = mContext
+        override fun doInBackground(vararg params: String?): String? {
+            try{
+                var jsonObject = JSONObject()
+                jsonObject.accumulate("name", item.name)
+                jsonObject.accumulate("number", item.number)
+                var con: HttpURLConnection? = null
+                var reader: BufferedReader? = null
+                try{
+                    var url = URL(params[0])
+                    con = url.openConnection() as HttpURLConnection
+                    con.requestMethod = "POST"
+                    con!!.setRequestProperty("Cache-Control", "no-cache")
+                    con.setRequestProperty(
+                        "Content-Type",
+                        "application/json"
+                    )
+                    con.setRequestProperty("Accept", "text/html")
+                    con.doInput = true
+                    con.doOutput = true
+                    con.connect()
+
+                    val outStream = con.outputStream
+                    val writer =
+                        BufferedWriter(OutputStreamWriter(outStream))
+                    writer.write(jsonObject.toString())
+                    writer.flush()
+                    writer.close()
+
+
+                    val stream = con.inputStream
+                    reader = BufferedReader(InputStreamReader(stream))
+                    val buffer = StringBuffer()
+                    var line: String? = ""
+                    while(reader.readLine().also{line = it} != null){
+                        buffer.append(line)
+                    }
+
+                    return buffer.toString()
+                }catch(e: MalformedURLException){
+                    e.printStackTrace()
+                }catch(e: IOException){
+                    e.printStackTrace()
+                }finally {
+                    con?.disconnect()
+                    try{
+                        reader?.close()
+                    }catch(e: IOException){
+                        e.printStackTrace()
+                    }
+                }
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+            return null
+        }
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            val jObject = JSONObject(result)
+            if(jObject.getString("Success") == "Success"){
+                Toast.makeText(mContext, "추가 성공", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                Toast.makeText(mContext, "추가 실패", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
 
