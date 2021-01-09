@@ -1,9 +1,13 @@
 package com.example.madcamp_w2_frontend
 
 import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
+import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import com.facebook.FacebookSdk.getApplicationContext
 import com.google.gson.JsonObject
 import org.json.JSONObject
 import org.xml.sax.Parser
@@ -82,7 +86,18 @@ class FacebookAccess {
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
-
+            Log.d("onPostExecute", result!!)
+            val jObject = JSONObject(result)
+            Log.d("onPostExecute", jObject.getString("loginSuccess"))
+            if (jObject.getString("loginSuccess") == "Success") {
+                Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_LONG).show()
+                val intent = Intent(getApplicationContext(), MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                var bundle = Bundle()
+                bundle.putString("UniqueID", jObject.getString("uniqueId"))
+                intent.putExtras(bundle)
+                ContextCompat.startActivity(getApplicationContext(), intent, null)
+            }
         }
     }
 }

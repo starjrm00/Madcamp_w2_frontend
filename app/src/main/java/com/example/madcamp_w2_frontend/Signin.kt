@@ -24,6 +24,7 @@ import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
+import kotlin.reflect.typeOf
 
 
 class Signin: AppCompatActivity() {
@@ -187,11 +188,17 @@ class Signin: AppCompatActivity() {
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
-            if (result == "Success") {
+            Log.d("onPostExecute", result!!)
+            val jObject = JSONObject(result)
+            Log.d("onPostExecute", jObject.getString("loginSuccess"))
+            if (jObject.getString("loginSuccess") == "Success") {
                 success = true
                 Toast.makeText(mContext, "로그인 성공", Toast.LENGTH_LONG).show()
                 val intent = Intent(mContext, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                var bundle = Bundle()
+                bundle.putString("UniqueID", jObject.getString("uniqueId"))
+                intent.putExtras(bundle)
                 startActivity(mContext, intent, null)
             }
         }
