@@ -41,6 +41,7 @@ class Signin: AppCompatActivity() {
 
         val btn_sign_in = findViewById<Button>(R.id.btn_signin)
         btn_sign_in!!.setOnClickListener {
+            Log.d("touch", "try to signin")
             try_login(ID.text.toString(), PW.text.toString())
         }
 
@@ -99,7 +100,9 @@ class Signin: AppCompatActivity() {
 
     fun try_login(id: String, pw: String) : Boolean {
         try {
+            Log.d("try_login", "in the try")
             var jsonTask = com.example.madcamp_w2_frontend.Signin.JSONTask(id, pw, applicationContext)
+            Log.d("try_login", "let's execute jsonTask")
             jsonTask.execute("http://192.249.18.212:3000/login")
             return jsonTask.success
         } catch (e: JSONException) {
@@ -125,8 +128,10 @@ class Signin: AppCompatActivity() {
                 jsonObject.accumulate("password", pw)
                 var con: HttpURLConnection? = null
                 var reader: BufferedReader? = null
+                Log.d("JSONTask", "in 1st try")
 
                 try {
+                    Log.d("JSONTask", "in 2nd try")
                     val url = URL(params[0])
                     con = url.openConnection() as HttpURLConnection
                     con.requestMethod = "POST" //POST방식으로 보냄

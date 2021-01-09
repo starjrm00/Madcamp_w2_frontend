@@ -23,7 +23,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.madcamp_w2_frontend.R
 import kotlinx.android.synthetic.main.fragment_1.*
 import org.json.JSONObject
 
@@ -38,6 +37,27 @@ class Fragment1 : Fragment() {
     var sortText = ""
     var serach:CharSequence = ""
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        var rootView =  inflater.inflate(R.layout.fragment_1, container, false)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || isPermitted()) {
+            recyclerView = rootView.findViewById(R.id.rv_json!!)as RecyclerView
+            recyclerView.layoutManager = LinearLayoutManager(this.context)
+            list.addAll(getPhoneNumbers(sortText, searchText))
+            //adapter 연결
+            recyclerView.adapter = contactAdapter(list)
+            recyclerView.setHasFixedSize(true)
+            startProcess()
+        } else {
+            ActivityCompat.requestPermissions(this.requireActivity(), permissions, 99)
+        }
+
+        //startProcess()
+        return rootView
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
@@ -287,6 +307,7 @@ class Fragment1 : Fragment() {
                 val json_name = obj.getString("name")
                 val json_number = obj.getString("number")
                 list.add(list_item(json_id, json_name, json_number))
+                Log.d("list_item", "${json_id}, ${json_name}, ${json_number}")
             }
         }
         return list
@@ -306,33 +327,11 @@ class Fragment1 : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        var rootView =  inflater.inflate(R.layout.fragment_1, container, false)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || isPermitted()) {
-            recyclerView = rootView.findViewById(R.id.rv_json!!)as RecyclerView
-            recyclerView.layoutManager = LinearLayoutManager(this.context)
-            list.addAll(getPhoneNumbers(sortText, searchText))
-            //adapter 연결
-            recyclerView.adapter = contactAdapter(list)
-            recyclerView.setHasFixedSize(true)
-            startProcess()
-        } else {
-            ActivityCompat.requestPermissions(this.requireActivity(), permissions, 99)
-        }
-
-        //startProcess()
-        return rootView
-    }
-
     fun refreshFragment(fragment: Fragment, fragmentManager: FragmentManager){
         var ft: FragmentTransaction = fragmentManager.beginTransaction()
         ft.detach(fragment).attach(fragment).commit()
         Log.v("dialog", "Do refresh")
     }
-
-
-
 }
 
 

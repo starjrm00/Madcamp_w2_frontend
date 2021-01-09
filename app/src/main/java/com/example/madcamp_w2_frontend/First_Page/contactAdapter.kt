@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madcamp_w2_frontend.R
@@ -24,29 +25,26 @@ class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<co
 
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var name = itemView.findViewById<TextView>(R.id.tv_name)
-        var number = itemView.findViewById<TextView>(R.id.tv_number)
+        var name = itemView.tv_name
+        var number = itemView.tv_number
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): contactAdapter.ViewHolder {
         val inflatedView = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
-        return contactAdapter.ViewHolder(inflatedView).apply {
+        return ViewHolder(inflatedView).apply {
 
             /*Toast message*/
-            /*itemView.setOnLongClickListener(object :View.OnLongClickListener{
-                    override fun onLongClick(v: View?): Boolean {
-                        val curPos: Int = adapterPosition
-                        var item: list_item = JsonList.get(curPos)
+            itemView.setOnClickListener {
+                val curPos: Int = adapterPosition
+                var item: list_item = JsonList[curPos]
 
-                        //JsonList.removeAt(curPos)
-                        Toast.makeText(parent.context,
-                            "${curPos}\n ${item.name}\n ${item.number}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return true
-                    }
-
-                })*/
+                //JsonList.removeAt(curPos)
+                Toast.makeText(
+                    parent.context,
+                    "${curPos}\n ${item.name}\n ${item.number}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
 
             /* call */
             itemView.iv_call.setOnClickListener {
@@ -76,9 +74,9 @@ class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<co
                 builder.setView(dialogView)
                     .setTitle("연락처 삭제")
                     //.setMessage(dialogText.text.toString())
-                    .setPositiveButton("OK") { dialogInterface, i ->
+                    .setPositiveButton("OK") { _, _ ->
                         //builder.setTitle(dialogText.text.toString())
-                        JsonList.remove(JsonList.get(curPos))
+                        JsonList.remove(JsonList[curPos])
                         notifyItemRemoved(curPos)
                         notifyItemRangeChanged(curPos, JsonList.size)
                     }
@@ -93,56 +91,59 @@ class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<co
 
 
     override fun getItemCount(): Int {
-        return this.JsonList.size
+        Log.d("size of recyclerview", JsonList.size.toString())
+        return JsonList.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         //Log.d("setting recyclerview", "set name = ${JsonList[position].name}, number = ${JsonList[position].number}")
+        Log.d("holder", holder.toString())
         holder.name.text = (JsonList[position].name)
         holder.number.text = (JsonList[position].number)
+        Log.d("onBindViewHolder","name is ${JsonList[position].name} and number is ${JsonList[position].number}")
     }
 
 
-        /* for search */
-        override fun getFilter(): Filter {
-            return object : Filter() {
-                override fun performFiltering(constraint: CharSequence): FilterResults {
+    /* for search */
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence): FilterResults {
 
-                    val charString = constraint.toString()
-                    //filteredList.clear()
-                    filteredList = if (charString.isEmpty()) {
-                        unfilterList
-                    } else {
-                        var FilteringList = ArrayList<list_item>()
-                        val filterPattern = charString.toLowerCase()
+                val charString = constraint.toString()
+                //filteredList.clear()
+                filteredList = if (charString.isEmpty()) {
+                    unfilterList
+                } else {
+                    var FilteringList = ArrayList<list_item>()
+                    val filterPattern = charString.toLowerCase()
 
-                        for (item in unfilterList) {
-                            if (item.name.toLowerCase().contains(filterPattern)){
-                                FilteringList.add(item)
-                            }
+                    for (item in unfilterList) {
+                        if (item.name.toLowerCase().contains(filterPattern)){
+                            FilteringList.add(item)
                         }
-                        FilteringList
                     }
-
-
-                    val filterResults = FilterResults()
-                    filterResults.values = filteredList
-                    Log.d("filterResult", filterResults.values.toString())
-
-                    return filterResults
+                    FilteringList
                 }
 
-                override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                    Log.d("Filter", "change the list elements?")
-                    Log.d("Filter", filteredList.toString())
-                    //filteredList = results?.values as ArrayList<list_item>
-                    notifyDataSetChanged()
-                    Log.d("Filter", filteredList.toString())
-                    //filteredList.clear()
 
-                }
+                val filterResults = FilterResults()
+                filterResults.values = filteredList
+                Log.d("filterResult", filterResults.values.toString())
 
+                return filterResults
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                Log.d("Filter", "change the list elements?")
+                Log.d("Filter", filteredList.toString())
+                //filteredList = results?.values as ArrayList<list_item>
+                notifyDataSetChanged()
+                Log.d("Filter", filteredList.toString())
+            //filteredList.clear()
 
             }
+
+
         }
     }
+}
