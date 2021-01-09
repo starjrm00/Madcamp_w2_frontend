@@ -30,7 +30,7 @@ class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<co
 
     private var filteredList: ArrayList<list_item> = JsonList
     private var unfilterList: ArrayList<list_item> = JsonList
-
+    val serverip = "http://192.249.18.242:3000"
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var name = itemView.tv_name
@@ -85,7 +85,7 @@ class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<co
                     .setPositiveButton("OK") { _, _ ->
                         //builder.setTitle(dialogText.text.toString())
                         var jsonTask = JSONTask_delete_contact(JsonList[curPos], parent.context)
-                        jsonTask.execute("http://192.249.18.212:3000/delete_contact")
+                        jsonTask.execute(serverip+"/delete_contact")
                         JsonList.remove(JsonList[curPos])
                         notifyItemRemoved(curPos)
                         notifyItemRangeChanged(curPos, JsonList.size)

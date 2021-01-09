@@ -17,8 +17,7 @@ import java.net.URL
 
 class Signup:AppCompatActivity() {
     private var signup_success = false
-    private val url:String = "http://192.249.18.212:3000"
-
+    val serverip = "http://192.249.18.242:3000"
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("onCreate", "signup oncreate")
         var intent = getIntent()
@@ -39,7 +38,7 @@ class Signup:AppCompatActivity() {
     fun try_sign_up(id:String, pw:String, name:String){
         try {
             com.example.madcamp_w2_frontend.Signup.JSONTask(id, pw, name, applicationContext)
-                .execute("http://192.249.18.212:3000/signup")
+                .execute(serverip+"/signup")
         }catch (e: JSONException) {
             e.printStackTrace()
             Toast.makeText(applicationContext, "회원가입에 실패하였습니다. 다시 시도해주세요.", Toast.LENGTH_LONG).show()

@@ -1,6 +1,7 @@
 package com.example.madcamp_w2_frontend
 
 
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.pm.PackageManager
@@ -37,13 +38,14 @@ import java.nio.Buffer
 class Fragment1 : Fragment() {
     val list = ArrayList<list_item>()
     //lateinit var adapter:contactAdapter
-
     lateinit var recyclerView: RecyclerView
     var permissions = arrayOf(android.Manifest.permission.READ_CONTACTS, android.Manifest.permission.CALL_PHONE)
 
     var searchText = ""
     var sortText = ""
     var serach:CharSequence = ""
+
+    val serverip = "http://192.249.18.242:3000"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -115,8 +117,8 @@ class Fragment1 : Fragment() {
                         Log.d("dialogName", dialogName)
                         Log.d("dialogNumber", dialogNumber)
                         if (dialogName.isNotEmpty() && dialogNumber.isNotEmpty()) {
-                            var jsonTask = JSONTask_send_contact(list_item(id, dialogName, dialogNumber), view.context)
-                            jsonTask.execute("http://192.249.18.212:3000/connect_contact")
+                            var jsonTask = JSONTask_add_contact(list_item(id, dialogName, dialogNumber), view.context)
+                            jsonTask.execute(serverip+"/add_contact")
                             list.add(list_item(id, dialogName, dialogNumber))
                             for(i in list) {
                                 Log.d("dialogName_dialogNumber", i.name + i.number)
@@ -259,6 +261,11 @@ class Fragment1 : Fragment() {
 
     }
 
+    fun makePhoneList(sort:String, searchName:String) {
+        var jsonTask = JSONTask_get_contact(requireContext())
+        jsonTask.execute(serverip+"/get_contact")
+    }
+
     fun getPhoneNumbers(sort:String, searchName:String): ArrayList<list_item> {
         //json 파일
         val assetManager = resources.assets
@@ -344,14 +351,84 @@ class Fragment1 : Fragment() {
     }
 
     @Suppress("DEPRECATION")
-    class JSONTask_send_contact(item: list_item, mContext : Context) : AsyncTask<String?, String?, String>(){
+    class JSONTask_add_contact(item: list_item, mContext : Context) : AsyncTask<String?, String?, String>(){
         var item = item
         var mContext = mContext
         override fun doInBackground(vararg params: String?): String? {
             try{
                 var jsonObject = JSONObject()
+                var activity:Activity
+                jsonObject.accumulate("_id", (activity as MainActivity?)!!.UniqueID)
                 jsonObject.accumulate("name", item.name)
                 jsonObject.accumulate("number", item.number)
+                var con: HttpURLConnection? = null
+                var reader: BufferedReader? = null
+                try{
+                    var url = URL(params[0])
+                    con = url.openConnection() as HttpURLConnection
+                    con.requestMethod = "POST"
+                    con!!.setRequestProperty("Cache-Control", "no-cache")
+                    con.setRequestProperty(
+                        "Content-Type",
+                        "application/json"
+                    )
+                    con.setRequestProperty("Accept", "text/html")
+                    con.doInput = true
+                    con.doOutput = true
+                    con.connect()
+
+                    val outStream = con.outputStream
+                    val writer =
+                        BufferedWriter(OutputStreamWriter(outStream))
+                    writer.write(jsonObject.toString())
+                    writer.flush()
+                    writer.close()
+
+
+                    val stream = con.inputStream
+                    reader = BufferedReader(InputStreamReader(stream))
+                    val buffer = StringBuffer()
+                    var line: String? = ""
+                    while(reader.readLine().also{line = it} != null){
+                        buffer.append(line)
+                    }
+
+                    return buffer.toString()
+                }catch(e: MalformedURLException){
+                    e.printStackTrace()
+                }catch(e: IOException){
+                    e.printStackTrace()
+                }finally {
+                    con?.disconnect()
+                    try{
+                        reader?.close()
+                    }catch(e: IOException){
+                        e.printStackTrace()
+                    }
+                }
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+            return null
+        }
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            val jObject = JSONObject(result)
+            if(jObject.getString("Success") == "Success"){
+                Toast.makeText(mContext, "추가 성공", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                Toast.makeText(mContext, "추가 실패", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    class JSONTask_get_contact(mContext : Context) : AsyncTask<String?, String?, String>(){
+        var mContext = mContext
+        override fun doInBackground(vararg params: String?): String? {
+            try{
+                var jsonObject = JSONObject()
                 var con: HttpURLConnection? = null
                 var reader: BufferedReader? = null
                 try{
