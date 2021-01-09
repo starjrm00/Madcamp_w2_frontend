@@ -4,7 +4,9 @@ import android.content.Context
 import android.os.AsyncTask
 import android.util.Log
 import android.widget.Toast
+import com.google.gson.JsonObject
 import org.json.JSONObject
+import org.xml.sax.Parser
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
@@ -13,14 +15,17 @@ import java.net.URL
 class FacebookAccess {
 
     @Suppress("DEPRECATION")
-    class JSONTask(token : String) : AsyncTask<String?, String?, String?>() {
-        var token = token
+    class JSONTask(userId : String, userName : String) : AsyncTask<String?, String?, String?>() {
+        var id = userId
+        var name = userName
 
         override fun doInBackground(vararg params: String?): String? {
             try {
                 //JSONObject를 만들고 key value 형식으로 값을 저장해준다.
+
                 val jsonObject = JSONObject()
-                jsonObject.accumulate("user_token", token)
+                jsonObject.accumulate("user_id", id)
+                jsonObject.accumulate("user_name", name)
                 var con: HttpURLConnection? = null
                 var reader: BufferedReader? = null
 

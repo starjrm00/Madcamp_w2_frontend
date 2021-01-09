@@ -66,13 +66,14 @@ class Signin: AppCompatActivity() {
             override fun onSuccess(loginResult: LoginResult) {
                 var accessToken = loginResult.accessToken
 
-                com.example.madcamp_w2_frontend.FacebookAccess.JSONTask(accessToken.token)
-                    .execute("http://192.249.18.212:3000/facebookLogin")
-
                 //token으로 이름 등 정보 받는 법
                 val graphRequest = GraphRequest.newMeRequest(
                     loginResult.accessToken
-                ) { `object`, response -> Log.v("result", `object`.toString()) }
+                ) { `object`, response ->
+                    var userName = `object`.get("name") as String
+                    com.example.madcamp_w2_frontend.FacebookAccess.JSONTask(accessToken.userId, userName)
+                        .execute("http://192.249.18.212:3000/facebookLogin")
+                }
                 val parameters = Bundle()
                 parameters.putString("fields", "id,name,email,gender,birthday")
                 graphRequest.parameters = parameters
