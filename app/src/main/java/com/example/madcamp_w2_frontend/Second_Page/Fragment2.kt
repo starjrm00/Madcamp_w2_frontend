@@ -24,7 +24,6 @@ import com.example.madcamp_w2_frontend.image_item
 import kotlinx.android.synthetic.main.fragment_2.*
 import java.io.ByteArrayOutputStream
 
-
 class Fragment2(UniqueID: String) : Fragment() {
     lateinit var recyclerView2 : RecyclerView
     var image_list = ArrayList<String>()

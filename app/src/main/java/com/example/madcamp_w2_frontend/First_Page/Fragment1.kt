@@ -2,7 +2,9 @@ package com.example.madcamp_w2_frontend
 
 
 import android.app.Dialog
+import android.content.Context
 import android.content.pm.PackageManager
+import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
@@ -25,11 +27,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_1.*
 import org.json.JSONObject
+import java.io.*
+import java.lang.Exception
+import java.net.HttpURLConnection
+import java.net.MalformedURLException
+import java.net.URL
 
 class Fragment1(UniqueID: String) : Fragment() {
     val list = ArrayList<list_item>()
     //lateinit var adapter:contactAdapter
-
     lateinit var recyclerView: RecyclerView
     lateinit var rootView : View
     var permissions = arrayOf(android.Manifest.permission.READ_CONTACTS, android.Manifest.permission.CALL_PHONE)
@@ -37,6 +43,9 @@ class Fragment1(UniqueID: String) : Fragment() {
     var searchText = ""
     var sortText = ""
     var serach:CharSequence = ""
+
+    val serverip = "http://192.249.18.242:3000"
+    val UniqueID = UniqueID
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,9 +56,10 @@ class Fragment1(UniqueID: String) : Fragment() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || isPermitted()) {
             recyclerView = rootView.findViewById(R.id.rv_json!!)as RecyclerView
             recyclerView.layoutManager = LinearLayoutManager(this.context)
-            list.addAll(getPhoneNumbers(sortText, searchText))
+//            list.addAll(getPhoneNumbers(sortText, searchText))
+            makePhoneList()
             //adapter 연결
-            recyclerView.adapter = contactAdapter(list)
+            recyclerView.adapter = contactAdapter(list, UniqueID)
             recyclerView.setHasFixedSize(true)
             startProcess()
         } else {
@@ -107,17 +117,19 @@ class Fragment1(UniqueID: String) : Fragment() {
                         val dialogNumber = dialogView?.findViewById<TextView>(R.id.addNumber_)?.text.toString()
                         Log.d("dialogName", dialogName)
                         Log.d("dialogNumber", dialogNumber)
-                       // if (dialogName.isNotEmpty() && dialogNumber.isNotEmpty()) {
+                        if (dialogName.isNotEmpty() && dialogNumber.isNotEmpty()) {
+                            var jsonTask = JSONTask_add_contact(list_item(id, dialogName, dialogNumber), view.context, UniqueID)
+                            jsonTask.execute(serverip+"/add_contact")
                             list.add(list_item(id, dialogName, dialogNumber))
                             for(i in list) {
                                 Log.d("dialogName_dialogNumber", i.name + i.number)
                             }
                             dilaog01.dismiss()
-                            contactAdapter(list).notifyItemInserted(0);
+                            contactAdapter(list, UniqueID).notifyItemInserted(0);
                             //refreshFragment(this, parentFragmentManager)
 
                             Log.d("get_load_add", "get_load_add_button")
-                        //}
+                        }
 
                         Log.d("get_load_add", "get_load_add_button")
 
@@ -168,7 +180,7 @@ class Fragment1(UniqueID: String) : Fragment() {
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 //val ctAdapter = contactAdapter(list)
-                contactAdapter(list).getFilter().filter(s)
+                contactAdapter(list, UniqueID).getFilter().filter(s)
                 serach = s
                 Log.d("serach", serach.toString())
                 searchText = s.toString()
@@ -250,6 +262,11 @@ class Fragment1(UniqueID: String) : Fragment() {
 
     }
 
+    fun makePhoneList() {
+        var jsonTask = JSONTask_get_contact(requireContext(), UniqueID)
+        jsonTask.execute(serverip+"/get_contact")
+    }
+
     fun getPhoneNumbers(sort:String, searchName:String): ArrayList<list_item> {
         //json 파일
         val assetManager = resources.assets
@@ -259,21 +276,22 @@ class Fragment1(UniqueID: String) : Fragment() {
 
         val list = ArrayList<list_item>()
         val phoneUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
-        Log.d("phoneUri",phoneUri.toString() )
-        val projections = arrayOf(ContactsContract.CommonDataKinds.Phone.CONTACT_ID
-                , ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
-                , ContactsContract.CommonDataKinds.Phone.NUMBER)
-
+        Log.d("phoneUri", phoneUri.toString())
+        val projections = arrayOf(
+            ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+            ContactsContract.CommonDataKinds.Phone.NUMBER
+        )
 
 
         val resolver = activity?.contentResolver
-        var wheneClause:String? = null
+        var wheneClause: String? = null
 
         val optionSort = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
         var whereValues = arrayOf<String>()
         //var whereValues: Array<String>
         Log.d("searchName", searchName)
-        if(searchName.isNotEmpty() ?: false) {
+        if (searchName.isNotEmpty() ?: false) {
             wheneClause = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " like ?"
             whereValues = arrayOf("%$searchName%")
 
@@ -286,20 +304,20 @@ class Fragment1(UniqueID: String) : Fragment() {
 
         val cursor = resolver?.query(phoneUri, projections, wheneClause, whereValues, null)
 
-       while(cursor?.moveToNext() == true) {
+        while (cursor?.moveToNext() == true) {
             val id = cursor?.getString(0).toString()
             val name = cursor?.getString(1).toString()
             var number = cursor?.getString(2).toString()
-           Log.d("name", name)
-           Log.d("number", number)
+            Log.d("name", name)
+            Log.d("number", number)
             // json 파일에 넣기
             val main = JSONObject(jsonString)
-           jObject.put("person",main)
-           main.put("id", id)
-           main.put("name", name)
-           main.put("number", number)
+            jObject.put("person", main)
+            main.put("id", id)
+            main.put("name", name)
+            main.put("number", number)
 
-           //넣은 값을 불러와서 list item 에 부여
+            //넣은 값을 불러와서 list item 에 부여
             for (i in 0 until jObject.length()) {
                 //var jArray = jObject.getJSONArray("person")
                 val obj = jObject.getJSONObject("person")
@@ -313,7 +331,6 @@ class Fragment1(UniqueID: String) : Fragment() {
         }
         return list
     }
-
     @RequiresApi(Build.VERSION_CODES.M)
     fun isPermitted():Boolean {
         for(perm in permissions) {
@@ -332,6 +349,155 @@ class Fragment1(UniqueID: String) : Fragment() {
         var ft: FragmentTransaction = fragmentManager.beginTransaction()
         ft.detach(fragment).attach(fragment).commit()
         Log.v("dialog", "Do refresh")
+    }
+
+    @Suppress("DEPRECATION")
+    class JSONTask_add_contact(item: list_item, mContext : Context, UniqueID: String) : AsyncTask<String?, String?, String>(){
+        var item = item
+        var mContext = mContext
+        var UniqueID = UniqueID
+        override fun doInBackground(vararg params: String?): String? {
+            try{
+                var jsonObject = JSONObject()
+                jsonObject.accumulate("_id", UniqueID)
+                jsonObject.accumulate("name", item.name)
+                jsonObject.accumulate("number", item.number)
+                var con: HttpURLConnection? = null
+                var reader: BufferedReader? = null
+                try{
+                    var url = URL(params[0])
+                    con = url.openConnection() as HttpURLConnection
+                    con.requestMethod = "POST"
+                    con!!.setRequestProperty("Cache-Control", "no-cache")
+                    con.setRequestProperty(
+                        "Content-Type",
+                        "application/json"
+                    )
+                    con.setRequestProperty("Accept", "text/html")
+                    con.doInput = true
+                    con.doOutput = true
+                    con.connect()
+
+                    val outStream = con.outputStream
+                    val writer =
+                        BufferedWriter(OutputStreamWriter(outStream))
+                    writer.write(jsonObject.toString())
+                    writer.flush()
+                    writer.close()
+
+
+                    val stream = con.inputStream
+                    reader = BufferedReader(InputStreamReader(stream))
+                    val buffer = StringBuffer()
+                    var line: String? = ""
+                    while(reader.readLine().also{line = it} != null){
+                        buffer.append(line)
+                    }
+
+                    return buffer.toString()
+                }catch(e: MalformedURLException){
+                    e.printStackTrace()
+                }catch(e: IOException){
+                    e.printStackTrace()
+                }finally {
+                    con?.disconnect()
+                    try{
+                        reader?.close()
+                    }catch(e: IOException){
+                        e.printStackTrace()
+                    }
+                }
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+            return null
+        }
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            val jObject = JSONObject(result)
+            if(jObject.getString("Success") == "Success"){
+                Toast.makeText(mContext, "추가 성공", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                Toast.makeText(mContext, "추가 실패", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    inner class JSONTask_get_contact(mContext : Context, UniqueID: String) : AsyncTask<String?, String?, String>(){
+        var mContext = mContext
+        var UniqueID = UniqueID
+        override fun doInBackground(vararg params: String?): String? {
+            try{
+                var jsonObject = JSONObject()
+                jsonObject.accumulate("_id", UniqueID)
+                var con: HttpURLConnection? = null
+                var reader: BufferedReader? = null
+                try{
+                    var url = URL(params[0])
+                    con = url.openConnection() as HttpURLConnection
+                    con.requestMethod = "POST"
+                    con!!.setRequestProperty("Cache-Control", "no-cache")
+                    con.setRequestProperty(
+                        "Content-Type",
+                        "application/json"
+                    )
+                    con.setRequestProperty("Accept", "text/html")
+                    con.doInput = true
+                    con.doOutput = true
+                    con.connect()
+
+                    val outStream = con.outputStream
+                    val writer =
+                        BufferedWriter(OutputStreamWriter(outStream))
+                    writer.write(jsonObject.toString())
+                    writer.flush()
+                    writer.close()
+
+
+                    val stream = con.inputStream
+                    reader = BufferedReader(InputStreamReader(stream))
+                    val buffer = StringBuffer()
+                    var line: String? = ""
+                    while(reader.readLine().also{line = it} != null){
+                        buffer.append(line)
+                    }
+
+                    return buffer.toString()
+                }catch(e: MalformedURLException){
+                    e.printStackTrace()
+                }catch(e: IOException){
+                    e.printStackTrace()
+                }finally {
+                    con?.disconnect()
+                    try{
+                        reader?.close()
+                    }catch(e: IOException){
+                        e.printStackTrace()
+                    }
+                }
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+            return null
+        }
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            val jObject = JSONObject(result)
+            Log.d("result log", result!!)
+            val jArray = jObject.getJSONArray("contactList")
+            list.clear()
+
+            for(i in 0 until jArray.length()){
+                val obj = jArray.getJSONObject(i)
+                list.add(list_item("", obj.getString("name"), obj.getString("number")))
+            }
+
+            rv_json.adapter?.notifyDataSetChanged()
+            rv_json.setHasFixedSize(true)
+
+        }
     }
 }
 

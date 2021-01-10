@@ -1,8 +1,10 @@
 package com.example.madcamp_w2_frontend
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,15 +16,23 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.beust.klaxon.json
 import com.example.madcamp_w2_frontend.R
 import kotlinx.android.synthetic.main.list_item.view.*
+import org.json.JSONObject
+import java.io.*
+import java.lang.Exception
+import java.net.HttpURLConnection
+import java.net.MalformedURLException
+import java.net.URL
 import java.util.*
-class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<contactAdapter.ViewHolder>(), Filterable{
+class contactAdapter(val JsonList:ArrayList<list_item>, UniqueID:String): RecyclerView.Adapter<contactAdapter.ViewHolder>(), Filterable{
 
 
     private var filteredList: ArrayList<list_item> = JsonList
     private var unfilterList: ArrayList<list_item> = JsonList
-
+    val serverip = "http://192.249.18.242:3000"
+    val UniqueID = UniqueID
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var name = itemView.tv_name
@@ -76,6 +86,8 @@ class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<co
                     //.setMessage(dialogText.text.toString())
                     .setPositiveButton("OK") { _, _ ->
                         //builder.setTitle(dialogText.text.toString())
+                        var jsonTask = JSONTask_delete_contact(JsonList[curPos], parent.context, UniqueID)
+                        jsonTask.execute(serverip+"/delete_contact")
                         JsonList.remove(JsonList[curPos])
                         notifyItemRemoved(curPos)
                         notifyItemRangeChanged(curPos, JsonList.size)
@@ -143,6 +155,79 @@ class contactAdapter(val JsonList:ArrayList<list_item>): RecyclerView.Adapter<co
             }
 
 
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    class JSONTask_delete_contact(item: list_item, mContext : Context, UniqueID: String) : AsyncTask<String?, String?, String>(){
+        var item = item
+        var mContext = mContext
+        var UniqueID = UniqueID
+        override fun doInBackground(vararg params: String?): String? {
+            try{
+                var jsonObject = JSONObject()
+                jsonObject.accumulate("_id", UniqueID)
+                jsonObject.accumulate("name", item.name)
+                jsonObject.accumulate("number", item.number)
+                var con: HttpURLConnection? = null
+                var reader: BufferedReader? = null
+                try{
+                    var url = URL(params[0])
+                    con = url.openConnection() as HttpURLConnection
+                    con.requestMethod = "POST"
+                    con!!.setRequestProperty("Cache-Control", "no-cache")
+                    con.setRequestProperty(
+                        "Content-Type",
+                        "application/json"
+                    )
+                    con.setRequestProperty("Accept", "text/html")
+                    con.doInput = true
+                    con.doOutput = true
+                    con.connect()
+
+                    val outStream = con.outputStream
+                    val writer =
+                        BufferedWriter(OutputStreamWriter(outStream))
+                    writer.write(jsonObject.toString())
+                    writer.flush()
+                    writer.close()
+
+
+                    val stream = con.inputStream
+                    reader = BufferedReader(InputStreamReader(stream))
+                    val buffer = StringBuffer()
+                    var line: String? = ""
+                    while(reader.readLine().also{line = it} != null){
+                        buffer.append(line)
+                    }
+
+                    return buffer.toString()
+                }catch(e: MalformedURLException){
+                    e.printStackTrace()
+                }catch(e: IOException){
+                    e.printStackTrace()
+                }finally {
+                    con?.disconnect()
+                    try{
+                        reader?.close()
+                    }catch(e: IOException){
+                        e.printStackTrace()
+                    }
+                }
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+            return null
+        }
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            val jObject = JSONObject(result)
+            if(jObject.getString("Success") == "Success"){
+                Toast.makeText(mContext, "삭제 성공", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                Toast.makeText(mContext, "삭제 실패", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

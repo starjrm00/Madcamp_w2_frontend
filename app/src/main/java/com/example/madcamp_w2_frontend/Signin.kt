@@ -30,7 +30,7 @@ import kotlin.reflect.typeOf
 class Signin: AppCompatActivity() {
     var login_success = false
     private var callbackManager: CallbackManager? = null
-
+    val serverip = "http://192.249.18.242:3000"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,7 +72,7 @@ class Signin: AppCompatActivity() {
                 ) { `object`, response ->
                     var userName = `object`.get("name") as String
                     FacebookAccess.JSONTask(accessToken.userId, userName)
-                        .execute("http://192.249.18.212:3000/facebookLogin")
+                        .execute(serverip+"/facebookLogin")
                 }
                 val parameters = Bundle()
                 parameters.putString("fields", "id,name,email,gender,birthday")
@@ -102,7 +102,8 @@ class Signin: AppCompatActivity() {
             Log.d("try_login", "in the try")
             var jsonTask = com.example.madcamp_w2_frontend.Signin.JSONTask(id, pw, applicationContext)
             Log.d("try_login", "let's execute jsonTask")
-            jsonTask.execute("http://192.249.18.212:3000/login")
+            Log.d("try_login", "url is "+serverip+"/login")
+            jsonTask.execute(serverip+"/login")
             return jsonTask.success
         } catch (e: JSONException) {
             e.printStackTrace()
@@ -133,6 +134,7 @@ class Signin: AppCompatActivity() {
                     Log.d("JSONTask", "in 2nd try")
                     val url = URL(params[0])
                     con = url.openConnection() as HttpURLConnection
+                    Log.d("url", url.toString())
                     con.requestMethod = "POST" //POST방식으로 보냄
                     con!!.setRequestProperty("Cache-Control", "no-cache") //캐시 설정
                     con.setRequestProperty(
