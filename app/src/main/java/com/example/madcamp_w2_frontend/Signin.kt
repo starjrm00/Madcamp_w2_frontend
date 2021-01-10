@@ -30,7 +30,7 @@ import kotlin.reflect.typeOf
 class Signin: AppCompatActivity() {
     var login_success = false
     private var callbackManager: CallbackManager? = null
-    val serverip = "http://192.249.18.242:3000"
+    val serverip = "http://192.249.18.212:3000"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

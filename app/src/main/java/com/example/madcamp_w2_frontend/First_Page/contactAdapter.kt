@@ -31,7 +31,7 @@ class contactAdapter(val JsonList:ArrayList<list_item>, UniqueID:String): Recycl
 
     private var filteredList: ArrayList<list_item> = JsonList
     private var unfilterList: ArrayList<list_item> = JsonList
-    val serverip = "http://192.249.18.242:3000"
+    val serverip = "http://192.249.18.212:3000"
     val UniqueID = UniqueID
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

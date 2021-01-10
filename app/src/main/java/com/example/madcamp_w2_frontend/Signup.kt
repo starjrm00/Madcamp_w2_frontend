@@ -17,7 +17,7 @@ import java.net.URL
 
 class Signup:AppCompatActivity() {
     private var signup_success = false
-    val serverip = "http://192.249.18.242:3000"
+    val serverip = "http://192.249.18.212:3000"
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("onCreate", "signup oncreate")
         var intent = getIntent()

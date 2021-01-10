@@ -44,7 +44,7 @@ class Fragment1(UniqueID: String) : Fragment() {
     var sortText = ""
     var serach:CharSequence = ""
 
-    val serverip = "http://192.249.18.242:3000"
+    val serverip = "http://192.249.18.212:3000"
     val UniqueID = UniqueID
 
     override fun onCreateView(
@@ -136,36 +136,6 @@ class Fragment1(UniqueID: String) : Fragment() {
                         //dilaog01.dismiss()
 
                     }
-
-
-
-
-                //})
-
-
-            //}
-
-
-            /*alterdialog*/
-            /*var add_builder = AlertDialog.Builder(view?.context)
-            //val inflater = LayoutInflater.from(view?.context)
-            //val dialogView = inflater.inflate(R.layout.cutom_add_dialog, null)
-            add_builder.setView(dialogView)
-                .setPositiveButton("ADD") { dialogInterface, i ->
-//                    add_builder.setTitle(dialogText.text.toString())
-                    val id: String = ""
-                    val dialogName = dialogView?.findViewById<TextView>(R.id.addName_)?.text.toString()
-                    val dialogNumber = dialogView?.findViewById<TextView>(R.id.addNumber_)?.text.toString()
-                    list.add(list_item(id, dialogName, dialogNumber))
-                    //refreshFragment(this, parentFragmentManager)
-                    contactAdapter(list).notifyItemInserted(0);
-
-                }
-                .setNegativeButton("CANCEL") { dialogInterface, i ->
-                }
-                .show()
-
-             */
 
 
 

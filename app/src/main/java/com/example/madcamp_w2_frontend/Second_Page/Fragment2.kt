@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.AsyncTask
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
@@ -21,8 +22,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.madcamp_w2_frontend.ImageAdapter
 import com.example.madcamp_w2_frontend.R
 import com.example.madcamp_w2_frontend.image_item
+import com.example.madcamp_w2_frontend.list_item
+import kotlinx.android.synthetic.main.fragment_1.*
 import kotlinx.android.synthetic.main.fragment_2.*
-import java.io.ByteArrayOutputStream
+import org.json.JSONObject
+import java.io.*
+import java.lang.Exception
+import java.net.HttpURLConnection
+import java.net.MalformedURLException
+import java.net.URL
 
 class Fragment2(UniqueID: String) : Fragment() {
     lateinit var recyclerView2 : RecyclerView
@@ -32,6 +40,7 @@ class Fragment2(UniqueID: String) : Fragment() {
     private var imageUri:Uri? = null
     var isFabOpen = false
     val UniqueID = UniqueID
+    val serverip = "http://192.249.18.212:3000"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,8 +50,8 @@ class Fragment2(UniqueID: String) : Fragment() {
         val rootView = inflater.inflate(R.layout.fragment_2, container, false)
         recyclerView2 = rootView.findViewById(R.id.rv_image)as RecyclerView
         recyclerView2.layoutManager = GridLayoutManager(this.context,3)
-        image_list = getImageFromDB()
-        recyclerView2.adapter = ImageAdapter(image_list)
+        getImageFromDB()
+        recyclerView2.adapter = ImageAdapter(image_list, UniqueID)
         recyclerView2.setHasFixedSize(true)
         return rootView
     }
@@ -143,7 +152,7 @@ class Fragment2(UniqueID: String) : Fragment() {
         val bitmapString : String? = BitmapToString(bitmap)
         var jsonTask = com.example.madcamp_w2_frontend.SaveImage.JSONTask(bitmapString, UniqueID, context)
         Log.d("try_login", "let's execute jsonTask")
-        jsonTask.execute("http://192.249.18.212:3000/saveImage")
+        jsonTask.execute(serverip+"/saveImage")
     }
 
     fun BitmapToString(bitmap: Bitmap): String? {
@@ -154,10 +163,84 @@ class Fragment2(UniqueID: String) : Fragment() {
         return Base64.encodeToString(bytes, Base64.DEFAULT) //String을 retrurn
     }
 
-    fun getImageFromDB() : ArrayList<String> {
-        var jsonTask = com.example.madcamp_w2_frontend.GetImage.JSONTask(UniqueID, context)
-        jsonTask.execute("http://192.249.18.212:3000/getImages")
-        var gallery = jsonTask.result_gallery
-        return gallery
+    fun getImageFromDB() {
+        var jsonTask = JSONTask_get_image(UniqueID, context)
+        jsonTask.execute(serverip + "/getImages")
+    }
+
+    @Suppress("DEPRECATION")
+    inner class JSONTask_get_image(UniqueID: String, mContext : Context?) : AsyncTask<String?, String?, String>(){
+        var mContext = mContext
+        var UniqueID = UniqueID
+        override fun doInBackground(vararg params: String?): String? {
+            try{
+                var jsonObject = JSONObject()
+                jsonObject.accumulate("_id", UniqueID)
+                var con: HttpURLConnection? = null
+                var reader: BufferedReader? = null
+                try{
+                    var url = URL(params[0])
+                    con = url.openConnection() as HttpURLConnection
+                    con.requestMethod = "POST"
+                    con!!.setRequestProperty("Cache-Control", "no-cache")
+                    con.setRequestProperty(
+                        "Content-Type",
+                        "application/json"
+                    )
+                    con.setRequestProperty("Accept", "text/html")
+                    con.doInput = true
+                    con.doOutput = true
+                    con.connect()
+
+                    val outStream = con.outputStream
+                    val writer =
+                        BufferedWriter(OutputStreamWriter(outStream))
+                    writer.write(jsonObject.toString())
+                    writer.flush()
+                    writer.close()
+
+
+                    val stream = con.inputStream
+                    reader = BufferedReader(InputStreamReader(stream))
+                    val buffer = StringBuffer()
+                    var line: String? = ""
+                    while(reader.readLine().also{line = it} != null){
+                        buffer.append(line)
+                    }
+
+                    return buffer.toString()
+                }catch(e: MalformedURLException){
+                    e.printStackTrace()
+                }catch(e: IOException){
+                    e.printStackTrace()
+                }finally {
+                    con?.disconnect()
+                    try{
+                        reader?.close()
+                    }catch(e: IOException){
+                        e.printStackTrace()
+                    }
+                }
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+            return null
+        }
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            Log.i("test", "1")
+            val jObject = JSONObject(result)
+            Log.d("result log", result!!)
+            val jArray = jObject.getJSONArray("gallery")
+            image_list.clear()
+
+            for(i in 0 until jArray.length()){
+                val obj = jArray.getJSONObject(i)
+                image_list.add(obj.getString("imageBitmap"))
+            }
+
+            recyclerView2.adapter?.notifyDataSetChanged()
+            recyclerView2.setHasFixedSize(true)
+        }
     }
 }
