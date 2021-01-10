@@ -7,7 +7,7 @@
 
     tools:context=".ShowBigImage">
 
-    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+    <ImageView
         android:id="@+id/iv_detail"
         android:layout_width="294dp"
         android:layout_height="529dp"

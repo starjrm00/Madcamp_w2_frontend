@@ -4,7 +4,6 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -28,7 +27,7 @@ import java.io.ByteArrayOutputStream
 
 class Fragment2(UniqueID: String) : Fragment() {
     lateinit var recyclerView2 : RecyclerView
-    val image_list = ArrayList<image_item>()
+    var image_list = ArrayList<String>()
     private val pickImage = 100
     private val capturePhoto = 101
     private var imageUri:Uri? = null
@@ -78,7 +77,12 @@ class Fragment2(UniqueID: String) : Fragment() {
             if (requestCode == pickImage) {
                 imageUri = data?.data
                 saveImageinMongod(imageUri)
-                image_list.add(image_item(imageUri))
+                val bitmap =
+                    MediaStore.Images.Media.getBitmap(context?.contentResolver, imageUri)
+                var bitmapString : String? = BitmapToString(bitmap)
+                if (bitmapString != null) {
+                    image_list.add(bitmapString)
+                }
             }
             /* camera load */
             if (requestCode == capturePhoto) {
@@ -86,7 +90,10 @@ class Fragment2(UniqueID: String) : Fragment() {
                 var bitmap: Bitmap = bundle?.get("data") as Bitmap
                 var changedUri: Uri = BitmapToUri(this.requireContext(), bitmap)
                 saveImageinMongod(changedUri)
-                image_list.add(image_item(changedUri))
+                var bitmapString : String? = BitmapToString(bitmap)
+                if (bitmapString != null) {
+                    image_list.add(bitmapString)
+                }
             }
 
             refreshFragment(this, parentFragmentManager)
@@ -148,24 +155,10 @@ class Fragment2(UniqueID: String) : Fragment() {
         return Base64.encodeToString(bytes, Base64.DEFAULT) //String을 retrurn
     }
 
-    fun StringToBitmap(encodedString: String?): Bitmap? {
-        return try {
-            val encodeByte = Base64.decode(
-                encodedString,
-                Base64.DEFAULT
-            ) // String 화 된 이미지를  base64방식으로 인코딩하여 byte배열을 만듬
-            BitmapFactory.decodeByteArray(
-                encodeByte,
-                0,
-                encodeByte.size
-            ) //만들어진 bitmap을 return
-        } catch (e: Exception) {
-            e.message
-            null
-        }
-    }
-
-    fun getImageFromDB() : ArrayList<image_item> {
-        //TODO 이미지 가져오기
+    fun getImageFromDB() : ArrayList<String> {
+        var jsonTask = com.example.madcamp_w2_frontend.GetImage.JSONTask(UniqueID, context)
+        jsonTask.execute("http://192.249.18.212:3000/getImages")
+        var gallery = jsonTask.result_gallery
+        return gallery
     }
 }
