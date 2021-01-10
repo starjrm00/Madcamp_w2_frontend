@@ -55,7 +55,8 @@ class Fragment1(UniqueID: String) : Fragment() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || isPermitted()) {
             recyclerView = rootView.findViewById(R.id.rv_json!!)as RecyclerView
             recyclerView.layoutManager = LinearLayoutManager(this.context)
-            list.addAll(getPhoneNumbers(sortText, searchText))
+//            list.addAll(getPhoneNumbers(sortText, searchText))
+            makePhoneList()
             //adapter 연결
             recyclerView.adapter = contactAdapter(list, UniqueID)
             recyclerView.setHasFixedSize(true)
@@ -260,7 +261,7 @@ class Fragment1(UniqueID: String) : Fragment() {
 
     }
 
-    fun makePhoneList(sort:String, searchName:String) {
+    fun makePhoneList() {
         var jsonTask = JSONTask_get_contact(requireContext(), UniqueID)
         jsonTask.execute(serverip+"/get_contact")
     }
@@ -423,12 +424,13 @@ class Fragment1(UniqueID: String) : Fragment() {
     }
 
     @Suppress("DEPRECATION")
-    class JSONTask_get_contact(mContext : Context, UniqueID: String) : AsyncTask<String?, String?, String>(){
+    inner class JSONTask_get_contact(mContext : Context, UniqueID: String) : AsyncTask<String?, String?, String>(){
         var mContext = mContext
         var UniqueID = UniqueID
         override fun doInBackground(vararg params: String?): String? {
             try{
                 var jsonObject = JSONObject()
+                jsonObject.accumulate("_id", UniqueID)
                 var con: HttpURLConnection? = null
                 var reader: BufferedReader? = null
                 try{
@@ -482,12 +484,18 @@ class Fragment1(UniqueID: String) : Fragment() {
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
             val jObject = JSONObject(result)
-            if(jObject.getString("Success") == "Success"){
-                Toast.makeText(mContext, "추가 성공", Toast.LENGTH_SHORT).show()
+            Log.d("result log", result!!)
+            val jArray = jObject.getJSONArray("contactList")
+            list.clear()
+
+            for(i in 0 until jArray.length()){
+                val obj = jArray.getJSONObject(i)
+                list.add(list_item("", obj.getString("name"), obj.getString("number")))
             }
-            else{
-                Toast.makeText(mContext, "추가 실패", Toast.LENGTH_SHORT).show()
-            }
+
+            rv_json.adapter?.notifyDataSetChanged()
+            rv_json.setHasFixedSize(true)
+
         }
     }
 }
