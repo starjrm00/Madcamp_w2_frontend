@@ -24,12 +24,14 @@ class ShowWebToon: AppCompatActivity() {
     //episode list 보여주는 페이지
     lateinit var episodeRecycler : RecyclerView
     var epiList : MutableList<Episode> = ArrayList()
+    lateinit var uniqueID : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.one_webtoon_list)
         var site : String = intent.getStringExtra("site")!!
         var link : String = intent.getStringExtra("link" )!!
+        uniqueID = intent.getStringExtra("uniqueID")!!
         if (site == "Naver") {
             getNaverEpiList().execute(link)
         }
@@ -76,7 +78,7 @@ class ShowWebToon: AppCompatActivity() {
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
             episodeRecycler.layoutManager = LinearLayoutManager(applicationContext)
-            episodeRecycler.adapter = EpisodeAdapter(epiList, applicationContext)
+            episodeRecycler.adapter = EpisodeAdapter(epiList, applicationContext, uniqueID)
         }
     }
 }

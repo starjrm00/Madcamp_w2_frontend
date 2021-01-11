@@ -24,11 +24,12 @@ import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
 
-class EpisodeAdapter(val epiList:MutableList<Episode>, context: Context):
+class EpisodeAdapter(val epiList:MutableList<Episode>, context:Context, uniqueID : String):
 
     RecyclerView.Adapter<EpisodeAdapter.viewHolder>(){
 
     val mContext = context
+    val uniqueID = uniqueID
 
     class viewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val thumbnail = itemView.findViewById(R.id.epi_thumbnail) as ImageView
@@ -45,6 +46,7 @@ class EpisodeAdapter(val epiList:MutableList<Episode>, context: Context):
                 var intent = Intent(v?.context, ShowEpisode::class.java)
                 intent.putExtra("link", item.link)
                 intent.putExtra("site", item.site)
+                intent.putExtra("uniqueID", uniqueID)
 
                 v?.context?.startActivity(intent)
             }

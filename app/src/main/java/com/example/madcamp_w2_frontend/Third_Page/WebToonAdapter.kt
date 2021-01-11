@@ -37,6 +37,7 @@ class WebToonAdapter(val WebToonList:MutableList<WebToon>, val UniqueID : String
                     var intent: Intent = Intent(v?.context, ShowWebToon::class.java)
                     intent.putExtra("link", item.link)
                     intent.putExtra("site", item.site)
+                    intent.putExtra("uniqueID", UniqueID)
                     v?.context?.startActivity(intent)
                 }
             })
