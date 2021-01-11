@@ -6,10 +6,12 @@ import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import android.view.MotionEvent
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madcamp_w2_frontend.R
 import org.jsoup.Jsoup
@@ -70,7 +72,7 @@ class ShowWebToon: AppCompatActivity() {
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
-            episodeRecycler.layoutManager = GridLayoutManager(applicationContext, 3)
+            episodeRecycler.layoutManager = LinearLayoutManager(applicationContext)
             episodeRecycler.adapter = EpisodeAdapter(epiList, applicationContext)
         }
     }

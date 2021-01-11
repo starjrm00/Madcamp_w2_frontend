@@ -36,7 +36,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ShowBigImage"/>
-        <activity android:name=".MapActivity"/>
+        <activity android:name=".Third_Page.ShowWebToon"/>
         <activity android:name=".MainActivity"/>
         <activity android:name=".Signup"/>
         <activity android:name=".Signin"/>
