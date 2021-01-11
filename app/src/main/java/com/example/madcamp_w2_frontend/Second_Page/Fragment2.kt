@@ -1,6 +1,7 @@
 package com.example.madcamp_w2_frontend.Second_Page
 
 import android.app.Activity.RESULT_OK
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -13,7 +14,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.view.animation.AnimationUtils
+import android.widget.Button
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -23,6 +27,8 @@ import com.example.madcamp_w2_frontend.ImageAdapter
 import com.example.madcamp_w2_frontend.R
 import com.example.madcamp_w2_frontend.image_item
 import com.example.madcamp_w2_frontend.list_item
+import com.facebook.AccessToken
+import com.facebook.login.LoginManager
 import kotlinx.android.synthetic.main.fragment_1.*
 import kotlinx.android.synthetic.main.fragment_2.*
 import org.json.JSONObject
@@ -33,6 +39,7 @@ import java.net.MalformedURLException
 import java.net.URL
 
 class Fragment2(UniqueID: String) : Fragment() {
+    private lateinit var callback: OnBackPressedCallback
     lateinit var recyclerView2 : RecyclerView
     var image_list = ArrayList<String>()
     private val pickImage = 100
@@ -242,5 +249,37 @@ class Fragment2(UniqueID: String) : Fragment() {
             recyclerView2.adapter?.notifyDataSetChanged()
             recyclerView2.setHasFixedSize(true)
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                var logout_dialog = Dialog(context)
+                logout_dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                val inflater = LayoutInflater.from(context)
+                val dialogView = inflater.inflate(R.layout.logout, null)
+                logout_dialog.setContentView(dialogView)
+                logout_dialog.show()
+                var logout_btn: Button = dialogView.findViewById(R.id.logout_accept)
+                var cancel_btn: Button = dialogView.findViewById(R.id.logout_denied)
+
+                logout_btn.setOnClickListener{
+                    if(AccessToken.getCurrentAccessToken() != null) {
+                        LoginManager.getInstance().logOut()
+                    }
+                    activity?.finish()
+                }
+                cancel_btn.setOnClickListener{
+                    logout_dialog.dismiss()
+                }
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        callback.remove()
     }
 }

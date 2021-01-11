@@ -1,6 +1,9 @@
 package com.example.madcamp_w2_frontend
 
 import android.os.AsyncTask
+import android.app.Dialog
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,12 +21,23 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.TextNode
 import org.jsoup.select.Elements
 import java.io.IOException
+import android.view.Window
+import android.widget.Button
+import androidx.activity.OnBackPressedCallback
+import com.example.madcamp_w2_frontend.R
+import com.facebook.AccessToken
+import com.facebook.login.LoginManager
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import kotlinx.android.synthetic.main.fragment_3.*
 
 
 class Fragment3(UniqueID: String) : Fragment() {
     var webToonList : MutableList<WebToon> = ArrayList()
     lateinit var imageRecycler : RecyclerView
     val UniqueID = UniqueID
+
+    private lateinit var callback: OnBackPressedCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,6 +112,7 @@ class Fragment3(UniqueID: String) : Fragment() {
         }
     }
 
+<<<<<<< HEAD
     /*
     @Suppress("DEPRECATION")
     inner class getDaumData : AsyncTask<String?, Void?, String?>() {
@@ -132,5 +147,38 @@ class Fragment3(UniqueID: String) : Fragment() {
             return null
         }
     }*/
+=======
+    //override fun onMapReady(p0: GoogleMap?) {}
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                var logout_dialog = Dialog(context)
+                logout_dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                val inflater = LayoutInflater.from(context)
+                val dialogView = inflater.inflate(R.layout.logout, null)
+                logout_dialog.setContentView(dialogView)
+                logout_dialog.show()
+                var logout_btn: Button = dialogView.findViewById(R.id.logout_accept)
+                var cancel_btn: Button = dialogView.findViewById(R.id.logout_denied)
+>>>>>>> e6231496b6f3bbe0d81220033d30303c6c4c0691
 
+                logout_btn.setOnClickListener{
+                    if(AccessToken.getCurrentAccessToken() != null) {
+                        LoginManager.getInstance().logOut()
+                    }
+                    activity?.finish()
+                }
+                cancel_btn.setOnClickListener{
+                    logout_dialog.dismiss()
+                }
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        callback.remove()
+    }
 }

@@ -19,6 +19,7 @@ import android.view.Window
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -26,6 +27,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.AccessToken
+import com.facebook.login.LoginManager
 import kotlinx.android.synthetic.main.fragment_1.*
 import org.json.JSONObject
 import java.io.*
@@ -34,7 +37,9 @@ import java.net.MalformedURLException
 import java.net.URL
 
 class Fragment1(UniqueID: String) : Fragment() {
+    private lateinit var callback: OnBackPressedCallback
     val list = ArrayList<list_item>()
+    val dblist = ArrayList<list_item>()
     //lateinit var adapter:contactAdapter
     lateinit var recyclerView: RecyclerView
     lateinit var rootView : View
@@ -120,12 +125,13 @@ class Fragment1(UniqueID: String) : Fragment() {
                         if (dialogName.isNotEmpty() && dialogNumber.isNotEmpty()) {
                             var jsonTask = JSONTask_add_contact(list_item(id, dialogName, dialogNumber), view.context, UniqueID)
                             jsonTask.execute(serverip+"/add_contact")
-                            list.add(list_item(id, dialogName, dialogNumber))
-                            for(i in list) {
+                            dblist.add(list_item(id, dialogName, dialogNumber))
+                            for(i in dblist) {
                                 Log.d("dialogName_dialogNumber", i.name + i.number)
                             }
                             dilaog01.dismiss()
-                            contactAdapter(list, UniqueID).notifyItemInserted(0);
+                            makePhoneList()
+                            //contactAdapter(list, UniqueID).notifyItemInserted(0);
                             //refreshFragment(this, parentFragmentManager)
 
                             Log.d("get_load_add", "get_load_add_button")
@@ -195,7 +201,9 @@ class Fragment1(UniqueID: String) : Fragment() {
     }
 
     fun changeList() {
-        val newList = getPhoneNumbers(sortText, searchText)
+        // val newList = getPhoneNumbers(sortText, searchText)
+        makePhoneList()
+        /*
         for (item in newList){
             Log.d("List", item.name)
             Log.d("List", item.number)
@@ -207,7 +215,7 @@ class Fragment1(UniqueID: String) : Fragment() {
             Log.d("getItem1", item.number)
         }
         list.addAll(newList)
-
+*/
         //recyclerView.adapter = adapter
         rv_json.adapter?.notifyDataSetChanged()
         rv_json.setHasFixedSize(true)
@@ -451,21 +459,55 @@ class Fragment1(UniqueID: String) : Fragment() {
             val jObject = JSONObject(result)
             Log.d("result log", result!!)
             val jArray = jObject.getJSONArray("contactList")
-            list.clear()
+            dblist.clear()
 
             for(i in 0 until jArray.length()){
                 val obj = jArray.getJSONObject(i)
-                list.add(list_item("", obj.getString("name"), obj.getString("number")))
+                dblist.add(list_item("", obj.getString("name"), obj.getString("number")))
             }
+
+            val list_ = ArrayList<list_item>()
+            list_.addAll(dblist)
+            list.clear()
+            list.addAll(list_.filter {
+                it.name.contains(searchText)
+            } as ArrayList<list_item>)
 
             rv_json.adapter?.notifyDataSetChanged()
             rv_json.setHasFixedSize(true)
 
         }
     }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                var logout_dialog = Dialog(context)
+                logout_dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                val inflater = LayoutInflater.from(context)
+                val dialogView = inflater.inflate(R.layout.logout, null)
+                logout_dialog.setContentView(dialogView)
+                logout_dialog.show()
+                var logout_btn: Button = dialogView.findViewById(R.id.logout_accept)
+                var cancel_btn: Button = dialogView.findViewById(R.id.logout_denied)
+
+                logout_btn.setOnClickListener{
+                    if(AccessToken.getCurrentAccessToken() != null) {
+                        LoginManager.getInstance().logOut()
+                    }
+                    activity?.finish()
+                }
+                cancel_btn.setOnClickListener{
+                    logout_dialog.dismiss()
+                }
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        callback.remove()
+    }
 }
-
-
-
-
-
