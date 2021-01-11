@@ -22,7 +22,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Madcamp_w2_frontend"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:largeHeap = "true"
+        android:requestLegacyExternalStorage="true">
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id"/>
@@ -37,6 +39,7 @@
         </activity>
         <activity android:name=".ShowBigImage"/>
         <activity android:name=".Third_Page.ShowWebToon"/>
+        <activity android:name=".Third_Page.ShowEpisode"/>
         <activity android:name=".MainActivity"/>
         <activity android:name=".Signup"/>
         <activity android:name=".Signin"/>

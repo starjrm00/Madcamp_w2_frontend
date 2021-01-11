@@ -48,9 +48,12 @@ class ShowWebToon: AppCompatActivity() {
                 //episode title 불러오기
                 val titleElements : Elements = document.select("div.webtoon table.viewList tbody tr td.title a")
                 var titleList : MutableList<String> = ArrayList()
+                var linkList : MutableList<String> = ArrayList()
                 for (e in titleElements) {
                     val text : String = (e.childNode(0) as TextNode).wholeText
                     titleList.add(text)
+                    val link : String = e.attr("href")
+                    linkList.add("https://comic.naver.com" + link)
                 }
                 //episode thumbnail 불러오기
                 val imageElements : Elements = document.select("div.webtoon table.viewList tbody tr td a img")
@@ -61,7 +64,7 @@ class ShowWebToon: AppCompatActivity() {
                 }
 
                 for (index in titleList.indices) {
-                    epiList.add(Episode(titleList[index], imageList[index]))
+                    epiList.add(Episode(titleList[index], imageList[index], linkList[index], "Naver"))
                 }
 
             } catch (e: IOException) {

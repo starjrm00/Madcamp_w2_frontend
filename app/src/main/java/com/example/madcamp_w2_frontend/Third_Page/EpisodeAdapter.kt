@@ -36,18 +36,17 @@ class EpisodeAdapter(val epiList:MutableList<Episode>, context: Context):
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): viewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.episode, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.episode_list_item, parent, false)
 
         return viewHolder(view).apply{
             itemView.setOnClickListener { v ->
                 val curPos: Int = adapterPosition
                 var item: Episode = epiList.get(curPos)
-                //TODO(episode 화면으로 이동)
-                /*
-                var intent = Intent(v?.context, ShowBigImage::class.java)
-                intent.putExtra("photo", item.photo)
+                var intent = Intent(v?.context, ShowEpisode::class.java)
+                intent.putExtra("link", item.link)
+                intent.putExtra("site", item.site)
 
-                v?.context?.startActivity(intent)*/
+                v?.context?.startActivity(intent)
             }
         }
     }
