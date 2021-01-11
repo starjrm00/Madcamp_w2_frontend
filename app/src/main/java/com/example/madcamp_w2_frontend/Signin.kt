@@ -202,6 +202,8 @@ class Signin: AppCompatActivity() {
                 bundle.putString("UniqueID", jObject.getString("uniqueId"))
                 intent.putExtras(bundle)
                 startActivity(mContext, intent, null)
+            } else {
+                Toast.makeText(mContext, "로그인 실패", Toast.LENGTH_LONG).show()
             }
         }
     }

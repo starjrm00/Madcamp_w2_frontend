@@ -60,7 +60,7 @@ class ImageAdapter(val imageList:ArrayList<String>, UniqueID:String):
                     .setTitle("이미지 삭제")
                     .setPositiveButton("확인") { dialogInterface, i ->
                         //builder.setTitle(dialogText.text.toString())
-                        var jsonTask = JSONTask_delete_image(imageList[curPos], parent.context, UniqueID)
+                        var jsonTask = JSONTask_delete_image(imageList[curPos], parent.context, UniqueID, curPos)
                         jsonTask.execute(serverip+"/deleteImage")
                         imageList.remove(imageList.get(curPos))
                         notifyItemRemoved(curPos)
@@ -102,15 +102,17 @@ class ImageAdapter(val imageList:ArrayList<String>, UniqueID:String):
 
 
     @Suppress("DEPRECATION")
-    class JSONTask_delete_image(item: String, mContext : Context, UniqueID: String) : AsyncTask<String?, String?, String>(){
+    class JSONTask_delete_image(item: String, mContext : Context, UniqueID: String, curPos: Int) : AsyncTask<String?, String?, String>(){
         var item = item
         var mContext = mContext
         var UniqueID = UniqueID
+        var curPos = curPos
         override fun doInBackground(vararg params: String?): String? {
             try{
                 var jsonObject = JSONObject()
                 jsonObject.accumulate("_id", UniqueID)
                 jsonObject.accumulate("bitmap", item)
+                jsonObject.accumulate("index", curPos)
                 var con: HttpURLConnection? = null
                 var reader: BufferedReader? = null
                 try{

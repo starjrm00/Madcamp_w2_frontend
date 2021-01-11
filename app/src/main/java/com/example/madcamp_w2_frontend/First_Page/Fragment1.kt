@@ -1,6 +1,7 @@
 package com.example.madcamp_w2_frontend
 
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.pm.PackageManager
@@ -28,7 +29,6 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_1.*
 import org.json.JSONObject
 import java.io.*
-import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
@@ -142,8 +142,6 @@ class Fragment1(UniqueID: String) : Fragment() {
         }
 
 
-
-
         contact_Filter.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {}
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -156,14 +154,9 @@ class Fragment1(UniqueID: String) : Fragment() {
                 searchText = s.toString()
                 Log.d("searchText", searchText)
                 changeList()
-
             }
-
         })
-
     }
-
-
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if(requestCode == 99) {
@@ -301,6 +294,7 @@ class Fragment1(UniqueID: String) : Fragment() {
         }
         return list
     }
+
     @RequiresApi(Build.VERSION_CODES.M)
     fun isPermitted():Boolean {
         for(perm in permissions) {
