@@ -35,19 +35,15 @@ class WebToonAdapter(val WebToonList:MutableList<WebToon>, val UniqueID : String
                     val curPos: Int = adapterPosition
                     var item: WebToon = WebToonList.get(curPos)
                     var intent: Intent = Intent(v?.context, ShowWebToon::class.java)
-                    //TODO(webtoon 보여주는 세부페이지 생성)
-                    /*
-                    intent.putExtra("photo", item.photo)
-                    Log.d("putExtra", intent.putExtra("photo", item.photo).toString())
-                    v?.context?.startActivity(intent)*/
+                    intent.putExtra("link", item.link)
+                    intent.putExtra("site", item.site)
+                    v?.context?.startActivity(intent)
                 }
             })
         }
     }
 
     override fun onBindViewHolder(holder: viewHolder, position: Int) {
-        //val titleImageUrl = Uri.parse(WebToonList.get(position).ImageUrl)
-        //holder.image?.setImageURI(titleImageUrl)
         if (mContext != null) {
             Glide.with(mContext).load(WebToonList.get(position).ImageUrl).into(holder.image)
         }

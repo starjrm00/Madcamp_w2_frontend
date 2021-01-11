@@ -57,6 +57,8 @@ class Fragment3(UniqueID: String) : Fragment() {
         val rootView = inflater.inflate(R.layout.fragment_3, container, false)
         val naverComic = "https://comic.naver.com/webtoon/weekday.nhn"
         getNaverData().execute(naverComic)
+
+        //Daum Webtoon
         /*
         val week : Array<String> = arrayOf("mon", "tue", "wed", "thu", "fri", "sat", "sun")
         val daumComic = "http://webtoon.daum.net/#day="
@@ -64,6 +66,12 @@ class Fragment3(UniqueID: String) : Fragment() {
             val daumUrl = daumComic + day + "&tab=day"
             getDaumData().execute(daumUrl)
         }*/
+
+        //Lezhin Webtoon
+        /*
+        val lezhinComic = "https://www.lezhin.com/ko/scheduled?day=1"
+        getLezhinData().execute(lezhinComic)
+        */
 
         imageRecycler = rootView.findViewById(R.id.webtoon_image) as RecyclerView
         imageRecycler.layoutManager = GridLayoutManager(this.context, 3)
@@ -80,12 +88,15 @@ class Fragment3(UniqueID: String) : Fragment() {
         override fun doInBackground(vararg params: String?) : String? {
             try {
                 val document: Document = Jsoup.connect(params[0]).get()
-                //title 읽어오기
+                //title 읽어오기 + link 읽어오기
                 val titleElements : Elements = document.select("div.col_inner ul li a.title")
                 var titleList : MutableList<String> = ArrayList()
+                var linkList : MutableList<String> = ArrayList()
                 for (e in titleElements) {
                     val text : String = (e.childNode(0) as TextNode).wholeText
+                    val link : String = e.attr("href")
                     titleList.add(text)
+                    linkList.add("https://comic.naver.com" + link)
                 }
                 //썸네일 이미지 url 읽어오기
                 var imageList : MutableList<String> = ArrayList()
@@ -94,9 +105,14 @@ class Fragment3(UniqueID: String) : Fragment() {
                     val imageUrl : String = i.attr("src")
                     imageList.add(imageUrl)
                 }
+                /*
+                for (i in imageElements) {
+                    val imageUrl : String = i.attr("src")
+                    imageList.add(imageUrl)
+                }*/
 
                 for (index in titleList.indices) {
-                    webToonList.add(WebToon("Naver", titleList[index], imageList[index]))
+                    webToonList.add(WebToon("Naver", titleList[index], imageList[index], linkList[index]))
                 }
 
             } catch (e: IOException) {
@@ -112,7 +128,6 @@ class Fragment3(UniqueID: String) : Fragment() {
         }
     }
 
-    /*
     @Suppress("DEPRECATION")
     inner class getDaumData : AsyncTask<String?, Void?, String?>() {
 
@@ -136,16 +151,23 @@ class Fragment3(UniqueID: String) : Fragment() {
                     val imageUrl: String = i.attr("src")
                     imageList.add(imageUrl)
                 }
-
+                //세부 링크 url 읽어오기
+                var linkList : MutableList<String> = ArrayList()
+                val linkElements : Elements = document.select("div.col_inner ul li a")
+                Log.i("NaverLink", linkElements.toString())
                 for (index in titleList.indices) {
-                    webToonList.add(WebToon("Naver", titleList[index], imageList[index]))
+                    webToonList.add(WebToon("Daum", titleList[index], imageList[index], linkList[index]))
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
             }
             return null
         }
-    }*/
+    }
+
+
+
+    //logout
     //override fun onMapReady(p0: GoogleMap?) {}
     override fun onAttach(context: Context) {
         super.onAttach(context)
