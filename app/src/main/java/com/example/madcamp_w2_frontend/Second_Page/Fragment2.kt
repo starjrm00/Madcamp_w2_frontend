@@ -158,7 +158,7 @@ class Fragment2(UniqueID: String) : Fragment() {
     fun BitmapToString(bitmap: Bitmap): String? {
         val baos =
             ByteArrayOutputStream() //바이트 배열을 차례대로 읽어 들이기위한 ByteArrayOutputStream클래스 선언
-        bitmap.compress(Bitmap.CompressFormat.PNG, 70, baos) //bitmap을 압축 (숫자 70은 70%로 압축한다는 뜻)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos) //bitmap을 압축 (숫자 70은 70%로 압축한다는 뜻)
         val bytes = baos.toByteArray() //해당 bitmap을 byte배열로 바꿔준다.
         return Base64.encodeToString(bytes, Base64.DEFAULT) //String을 retrurn
     }
