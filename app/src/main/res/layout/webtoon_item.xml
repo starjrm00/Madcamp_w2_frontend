@@ -14,18 +14,30 @@
     android:orientation="vertical"
     tools:context=".Second_Page.Fragment2">
 
-    <ImageView
-        android:id="@+id/webtoon_thumbnail"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/webtoon_thumbnail"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <CheckBox
+            android:id="@+id/favorite"
+            android:layout_width="31dp"
+            android:layout_height="28dp"
+            android:layout_gravity="top|right"/>
+    </FrameLayout>
 
     <TextView
         android:id="@+id/webtoon_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView" />
+
 </LinearLayout>
