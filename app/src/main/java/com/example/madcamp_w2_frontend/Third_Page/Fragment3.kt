@@ -112,7 +112,6 @@ class Fragment3(UniqueID: String) : Fragment() {
         }
     }
 
-<<<<<<< HEAD
     /*
     @Suppress("DEPRECATION")
     inner class getDaumData : AsyncTask<String?, Void?, String?>() {
@@ -147,7 +146,6 @@ class Fragment3(UniqueID: String) : Fragment() {
             return null
         }
     }*/
-=======
     //override fun onMapReady(p0: GoogleMap?) {}
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -161,7 +159,6 @@ class Fragment3(UniqueID: String) : Fragment() {
                 logout_dialog.show()
                 var logout_btn: Button = dialogView.findViewById(R.id.logout_accept)
                 var cancel_btn: Button = dialogView.findViewById(R.id.logout_denied)
->>>>>>> e6231496b6f3bbe0d81220033d30303c6c4c0691
 
                 logout_btn.setOnClickListener{
                     if(AccessToken.getCurrentAccessToken() != null) {
