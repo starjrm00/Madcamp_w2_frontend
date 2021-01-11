@@ -22,7 +22,7 @@ import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
 
-class ImageAdapter(val imageList:ArrayList<String>, UniqueID:String):
+class ImageAdapter(val imageList:ArrayList<image_item>, UniqueID:String):
 
     RecyclerView.Adapter<ImageAdapter.viewHolder>(){
 
@@ -39,16 +39,16 @@ class ImageAdapter(val imageList:ArrayList<String>, UniqueID:String):
         return viewHolder(view).apply{
             itemView.setOnClickListener { v ->
                 val curPos: Int = adapterPosition
-                var item: String = imageList.get(curPos)
+                var item: image_item = imageList.get(curPos)
                 var intent = Intent(v?.context, ShowBigImage::class.java)
-                intent.putExtra("photo", item)
+                intent.putExtra("photo", item.photo)
 
                 v?.context?.startActivity(intent)
             }
 
             itemView.setOnLongClickListener { view ->
                 val curPos: Int = adapterPosition
-                var image: String = imageList[curPos]
+                var image: String = imageList[curPos].photo
 
                 //다이얼로그 생성
                 var builder = AlertDialog.Builder(view?.context)
@@ -62,7 +62,7 @@ class ImageAdapter(val imageList:ArrayList<String>, UniqueID:String):
                         //builder.setTitle(dialogText.text.toString())
                         var jsonTask = JSONTask_delete_image(imageList[curPos], parent.context, UniqueID, curPos)
                         jsonTask.execute(serverip+"/deleteImage")
-                        imageList.remove(imageList.get(curPos))
+                        imageList.remove(imageList[curPos])
                         notifyItemRemoved(curPos)
                         notifyItemRangeChanged(curPos, imageList.size)
                     }
@@ -76,7 +76,7 @@ class ImageAdapter(val imageList:ArrayList<String>, UniqueID:String):
 
 
     override fun onBindViewHolder(holder: viewHolder, position: Int) {
-            holder.image?.setImageBitmap(StringToBitmap(imageList[position]))
+            holder.image?.setImageBitmap(StringToBitmap(imageList[position].photo))
     }
 
     override fun getItemCount(): Int {
@@ -102,7 +102,7 @@ class ImageAdapter(val imageList:ArrayList<String>, UniqueID:String):
 
 
     @Suppress("DEPRECATION")
-    class JSONTask_delete_image(item: String, mContext : Context, UniqueID: String, curPos: Int) : AsyncTask<String?, String?, String>(){
+    class JSONTask_delete_image(item: image_item, mContext : Context, UniqueID: String, curPos: Int) : AsyncTask<String?, String?, String>(){
         var item = item
         var mContext = mContext
         var UniqueID = UniqueID
@@ -110,9 +110,8 @@ class ImageAdapter(val imageList:ArrayList<String>, UniqueID:String):
         override fun doInBackground(vararg params: String?): String? {
             try{
                 var jsonObject = JSONObject()
-                jsonObject.accumulate("_id", UniqueID)
-                jsonObject.accumulate("bitmap", item)
-                jsonObject.accumulate("index", curPos)
+                jsonObject.accumulate("uid", UniqueID)
+                jsonObject.accumulate("_id", item._id)
                 var con: HttpURLConnection? = null
                 var reader: BufferedReader? = null
                 try{
