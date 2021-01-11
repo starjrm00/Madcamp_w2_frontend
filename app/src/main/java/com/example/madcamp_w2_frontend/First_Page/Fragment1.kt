@@ -35,6 +35,7 @@ import java.net.URL
 
 class Fragment1(UniqueID: String) : Fragment() {
     val list = ArrayList<list_item>()
+    val dblist = ArrayList<list_item>()
     //lateinit var adapter:contactAdapter
     lateinit var recyclerView: RecyclerView
     var permissions = arrayOf(android.Manifest.permission.READ_CONTACTS, android.Manifest.permission.CALL_PHONE)
@@ -119,12 +120,13 @@ class Fragment1(UniqueID: String) : Fragment() {
                         if (dialogName.isNotEmpty() && dialogNumber.isNotEmpty()) {
                             var jsonTask = JSONTask_add_contact(list_item(id, dialogName, dialogNumber), view.context, UniqueID)
                             jsonTask.execute(serverip+"/add_contact")
-                            list.add(list_item(id, dialogName, dialogNumber))
-                            for(i in list) {
+                            dblist.add(list_item(id, dialogName, dialogNumber))
+                            for(i in dblist) {
                                 Log.d("dialogName_dialogNumber", i.name + i.number)
                             }
                             dilaog01.dismiss()
-                            contactAdapter(list, UniqueID).notifyItemInserted(0);
+                            makePhoneList()
+                            //contactAdapter(list, UniqueID).notifyItemInserted(0);
                             //refreshFragment(this, parentFragmentManager)
 
                             Log.d("get_load_add", "get_load_add_button")
@@ -231,7 +233,9 @@ class Fragment1(UniqueID: String) : Fragment() {
     }
 
     fun changeList() {
-        val newList = getPhoneNumbers(sortText, searchText)
+        // val newList = getPhoneNumbers(sortText, searchText)
+        makePhoneList()
+        /*
         for (item in newList){
             Log.d("List", item.name)
             Log.d("List", item.number)
@@ -243,7 +247,7 @@ class Fragment1(UniqueID: String) : Fragment() {
             Log.d("getItem1", item.number)
         }
         list.addAll(newList)
-
+*/
         //recyclerView.adapter = adapter
         rv_json.adapter?.notifyDataSetChanged()
         rv_json.setHasFixedSize(true)
@@ -486,12 +490,19 @@ class Fragment1(UniqueID: String) : Fragment() {
             val jObject = JSONObject(result)
             Log.d("result log", result!!)
             val jArray = jObject.getJSONArray("contactList")
-            list.clear()
+            dblist.clear()
 
             for(i in 0 until jArray.length()){
                 val obj = jArray.getJSONObject(i)
-                list.add(list_item("", obj.getString("name"), obj.getString("number")))
+                dblist.add(list_item("", obj.getString("name"), obj.getString("number")))
             }
+
+            val list_ = ArrayList<list_item>()
+            list_.addAll(dblist)
+            list.clear()
+            list.addAll(list_.filter {
+                it.name.contains(searchText)
+            } as ArrayList<list_item>)
 
             rv_json.adapter?.notifyDataSetChanged()
             rv_json.setHasFixedSize(true)
