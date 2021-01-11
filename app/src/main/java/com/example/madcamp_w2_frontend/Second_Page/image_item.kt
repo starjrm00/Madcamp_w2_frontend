@@ -4,6 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 
-class image_item(var photo: Uri?) {
+class image_item(val _id:String, var photo: String) {
 
 }
