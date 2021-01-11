@@ -19,6 +19,7 @@ import android.view.Window
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -26,6 +27,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.AccessToken
+import com.facebook.login.LoginManager
 import kotlinx.android.synthetic.main.fragment_1.*
 import org.json.JSONObject
 import java.io.*
@@ -34,6 +37,7 @@ import java.net.MalformedURLException
 import java.net.URL
 
 class Fragment1(UniqueID: String) : Fragment() {
+    private lateinit var callback: OnBackPressedCallback
     val list = ArrayList<list_item>()
     val dblist = ArrayList<list_item>()
     //lateinit var adapter:contactAdapter
@@ -474,9 +478,36 @@ class Fragment1(UniqueID: String) : Fragment() {
 
         }
     }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                var logout_dialog = Dialog(context)
+                logout_dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                val inflater = LayoutInflater.from(context)
+                val dialogView = inflater.inflate(R.layout.logout, null)
+                logout_dialog.setContentView(dialogView)
+                logout_dialog.show()
+                var logout_btn: Button = dialogView.findViewById(R.id.logout_accept)
+                var cancel_btn: Button = dialogView.findViewById(R.id.logout_denied)
+
+                logout_btn.setOnClickListener{
+                    if(AccessToken.getCurrentAccessToken() != null) {
+                        LoginManager.getInstance().logOut()
+                    }
+                    activity?.finish()
+                }
+                cancel_btn.setOnClickListener{
+                    logout_dialog.dismiss()
+                }
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        callback.remove()
+    }
 }
-
-
-
-
-
