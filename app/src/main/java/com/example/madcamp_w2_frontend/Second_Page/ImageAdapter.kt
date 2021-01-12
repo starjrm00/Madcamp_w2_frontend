@@ -16,13 +16,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.madcamp_w2_frontend.R
+import com.example.madcamp_w2_frontend.Second_Page.ShowCaptureImage
 import org.json.JSONObject
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
 
-class ImageAdapter(val imageList:ArrayList<image_item>, UniqueID:String):
+class ImageAdapter(val imageList:ArrayList<image_item>, val captureList: ArrayList<capture>, UniqueID:String):
 
     RecyclerView.Adapter<ImageAdapter.viewHolder>(){
 
@@ -40,10 +41,21 @@ class ImageAdapter(val imageList:ArrayList<image_item>, UniqueID:String):
             itemView.setOnClickListener { v ->
                 val curPos: Int = adapterPosition
                 var item: image_item = imageList.get(curPos)
-                var intent = Intent(v?.context, ShowBigImage::class.java)
-                intent.putExtra("photo", item.photo)
-
-                v?.context?.startActivity(intent)
+                if (!item.isCapture) {
+                    var intent = Intent(v?.context, ShowBigImage::class.java)
+                    intent.putExtra("photo", item.photo)
+                    v?.context?.startActivity(intent)
+                } else {
+                    var intent = Intent(v?.context, ShowCaptureImage::class.java)
+                    for (i in 0 until captureList.size) {
+                        var currentCaptureList : capture = captureList[i]
+                        if (currentCaptureList.title == item.webtoonTitle) {
+                            var uriList = currentCaptureList.uriList
+                            intent.putExtra("captureUriList", uriList)
+                        }
+                    }
+                    v?.context?.startActivity(intent)
+                }
             }
 
             itemView.setOnLongClickListener { view ->
