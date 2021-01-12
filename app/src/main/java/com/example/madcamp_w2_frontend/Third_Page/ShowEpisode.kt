@@ -12,6 +12,7 @@ import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -42,6 +43,7 @@ class ShowEpisode: AppCompatActivity() {
     var imageList : MutableList<String> = ArrayList<String>()
     val serverip = "http://192.249.18.212:3000"
     lateinit var webView: WebView
+    lateinit var webSettings: WebSettings
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,12 +63,24 @@ class ShowEpisode: AppCompatActivity() {
 
         //oneEpisodeRecycler = findViewById(R.id.episode_image_list) as RecyclerView
         webView = findViewById(R.id.episode)
+        webSettings = webView.settings
+        webSettings.javaScriptEnabled = true         // 자바스크립트 사용
+        webSettings.setSupportMultipleWindows(true)    // 새창 띄우기 허용
+        webSettings.javaScriptCanOpenWindowsAutomatically = true // 자바스크립트 새창 띄우기 허용
+        webSettings.loadWithOverviewMode = true      // 메타태그 허용
+        webSettings.useWideViewPort = true           // 화면 사이즈 맞추기 허용
+        webSettings.setSupportZoom(false)              // 화면줌 허용 여부
+        webSettings.builtInZoomControls = false      // 화면 확대 축소 허용 여부
+//        webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN); // 컨텐츠 사이즈 맞추기
+        webSettings.cacheMode = WebSettings.LOAD_NO_CACHE        // 브라우저 노캐쉬
+        webSettings.domStorageEnabled = true         // 로컬저장소 허용
+
         webView.loadUrl(link)
         webView.webChromeClient = WebChromeClient()
         webView.webViewClient = WebViewClient()
         var captureButton = findViewById<FloatingActionButton>(R.id.btn_capture)
         captureButton.setOnClickListener {
-            var rootView: View = getWindow().getDecorView() //전체 화면
+            var rootView: View = window.decorView //전체 화면
             var screenShot = ScreenShot(rootView)
             if (screenShot != null) {
                 sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(screenShot)))
@@ -85,7 +99,7 @@ class ShowEpisode: AppCompatActivity() {
 
     fun ScreenShot(view: View) : File? {
         view.isDrawingCacheEnabled = true
-        var screenBitmap : Bitmap = view.getDrawingCache()
+        var screenBitmap : Bitmap = view.drawingCache
         val currentDateTime = Calendar.getInstance().time
         var dateFormat : String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.KOREA).format(currentDateTime)
         var filename : String = dateFormat + ".png"
@@ -160,7 +174,7 @@ class ShowEpisode: AppCompatActivity() {
                     val url = URL(params[0])
                     con = url.openConnection() as HttpURLConnection
                     con.requestMethod = "POST" //POST방식으로 보냄
-                    con!!.setRequestProperty("Cache-Control", "no-cache") //캐시 설정
+                    con.setRequestProperty("Cache-Control", "no-cache") //캐시 설정
                     con.setRequestProperty(
                         "Content-Type",
                         "application/json"
