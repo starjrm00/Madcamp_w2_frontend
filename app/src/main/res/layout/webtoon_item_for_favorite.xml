@@ -27,6 +27,7 @@
         android:id="@+id/webtoon_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/tvn_medium"
         android:text="TextView" />
 
 </LinearLayout>

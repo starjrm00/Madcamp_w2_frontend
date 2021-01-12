@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     android:paddingLeft="16dp"
+    android:backgroundTint="@color/background_color"
     tools:context=".Fragment1">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -31,6 +32,7 @@
         android:drawableLeft="@drawable/ic_baseline_search_24"
         android:ems="10"
         android:hint="search"
+        android:fontFamily="@font/tvn_medium"
         android:inputType="textPersonName"
         android:padding="16dp"
         app:layout_constraintEnd_toEndOf="parent"

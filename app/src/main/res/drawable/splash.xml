@@ -3,7 +3,7 @@
     <item android:drawable="@android:color/background_dark"/>
     <item>
         <bitmap
-            android:src="@drawable/unnamed"
+            android:src="@drawable/splash_webtoon"
             android:gravity="center"/>
     </item>
 </layer-list>

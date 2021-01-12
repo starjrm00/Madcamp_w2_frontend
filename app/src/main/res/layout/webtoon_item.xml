@@ -40,6 +40,9 @@
         android:id="@+id/webtoon_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/tvn_medium"
+        android:layout_gravity="center"
+        android:textSize="20dp"
         android:text="TextView" />
 
 </LinearLayout>

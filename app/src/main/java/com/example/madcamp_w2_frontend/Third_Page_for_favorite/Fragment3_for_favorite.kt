@@ -19,6 +19,7 @@ import org.jsoup.nodes.TextNode
 import org.jsoup.select.Elements
 import android.view.Window
 import android.widget.Button
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContentProviderCompat.requireContext
@@ -38,6 +39,7 @@ class Fragment3_for_favorite() : AppCompatActivity() {
     var favorite = ArrayList<String>()
     lateinit var imageRecycler : RecyclerView
     lateinit var UniqueID:String
+    lateinit var favoriteTitleView : TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +54,10 @@ class Fragment3_for_favorite() : AppCompatActivity() {
         getNaverData().execute(naverComic)
 
         imageRecycler = findViewById(R.id.webtoon_image_for_favorite)
+        favoriteTitleView = findViewById(R.id.favorite_title) as TextView
+
+        JSONTask_get_name(UniqueID).execute(serverip+"/getName")
+
         imageRecycler.layoutManager = GridLayoutManager(applicationContext, 3)
         imageRecycler.adapter = WebToonAdapter_for_favorite(webToonList, UniqueID, applicationContext)
         imageRecycler.setHasFixedSize(true)
@@ -213,6 +219,71 @@ class Fragment3_for_favorite() : AppCompatActivity() {
             }
 
             Log.d("favorite List", favorite.toString())
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    inner class JSONTask_get_name(UniqueID: String) : AsyncTask<String?, String?, String>(){
+
+        var UniqueID = UniqueID
+
+        override fun doInBackground(vararg params: String?): String? {
+            try{
+                var jsonObject = JSONObject()
+                jsonObject.accumulate("_id", UniqueID)
+                var con: HttpURLConnection? = null
+                var reader: BufferedReader? = null
+                try{
+                    var url = URL(params[0])
+                    con = url.openConnection() as HttpURLConnection
+                    con.requestMethod = "POST"
+                    con!!.setRequestProperty("Cache-Control", "no-cache")
+                    con.setRequestProperty(
+                        "Content-Type",
+                        "application/json"
+                    )
+                    con.setRequestProperty("Accept", "text/html")
+                    con.doInput = true
+                    con.doOutput = true
+                    con.connect()
+
+                    val outStream = con.outputStream
+                    val writer =
+                        BufferedWriter(OutputStreamWriter(outStream))
+                    writer.write(jsonObject.toString())
+                    writer.flush()
+                    writer.close()
+
+
+                    val stream = con.inputStream
+                    reader = BufferedReader(InputStreamReader(stream))
+                    val buffer = StringBuffer()
+                    var line: String? = ""
+                    while(reader.readLine().also{line = it} != null){
+                        buffer.append(line)
+                    }
+
+                    return buffer.toString()
+                }catch(e: MalformedURLException){
+                    e.printStackTrace()
+                }catch(e: IOException){
+                    e.printStackTrace()
+                }finally {
+                    con?.disconnect()
+                    try{
+                        reader?.close()
+                    }catch(e: IOException){
+                        e.printStackTrace()
+                    }
+                }
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+            return null
+        }
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            favoriteTitleView.setText(result + "님의 즐겨찾기 목록")
         }
     }
 }
