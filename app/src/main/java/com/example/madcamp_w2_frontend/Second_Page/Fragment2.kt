@@ -60,6 +60,7 @@ class Fragment2(UniqueID: String) : Fragment() {
         getCaptureFromDB()
         recyclerView2.adapter = ImageAdapter(image_list, capture_list, UniqueID)
         recyclerView2.setHasFixedSize(true)
+        refreshFragment(this, parentFragmentManager)
         return rootView
     }
 
@@ -114,11 +115,6 @@ class Fragment2(UniqueID: String) : Fragment() {
     private fun takePicture() {
         var capture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         startActivityForResult(capture, capturePhoto)
-    }
-
-    fun refreshFragment(fragment: Fragment, fragmentManager: FragmentManager){
-        var ft: FragmentTransaction = fragmentManager.beginTransaction()
-        ft.detach(fragment).attach(fragment).commit()
     }
 
     fun toggleFab() {
@@ -452,5 +448,10 @@ class Fragment2(UniqueID: String) : Fragment() {
     override fun onDetach() {
         super.onDetach()
         callback.remove()
+    }
+
+    fun refreshFragment(fragment: Fragment, fragmentManager: FragmentManager){
+        var ft: FragmentTransaction = fragmentManager.beginTransaction()
+        ft.detach(fragment).attach(fragment).commit()
     }
 }
