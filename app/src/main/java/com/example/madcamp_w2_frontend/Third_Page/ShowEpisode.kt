@@ -5,12 +5,17 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.AsyncTask
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Base64
 import android.util.Log
 import android.view.View
+import android.webkit.WebChromeClient
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,25 +37,34 @@ import kotlin.collections.ArrayList
 class ShowEpisode: AppCompatActivity() {
     //한 회차를 보여주는 페이지
 
-    lateinit var oneEpisodeRecycler : RecyclerView
+    //lateinit var oneEpisodeRecycler : RecyclerView
     lateinit var UniqueID : String
     var imageList : MutableList<String> = ArrayList<String>()
     val serverip = "http://192.249.18.212:3000"
+    lateinit var webView: WebView
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.one_episode)
         var site : String = intent.getStringExtra("site")!!
-        var link : String = intent.getStringExtra("link" )!!
+        var link = intent.getStringExtra("link" )!!
         var webToonTitle : String = intent.getStringExtra("webToonTitle")!!
         var webToonThumbnail : String = intent.getStringExtra("webToonThumbnail")!!
         UniqueID = intent.getStringExtra("uniqueID")!!
-        if (site == "Naver") {
-            getNaverEpisode().execute(link)
-        }
+//        if (site == "Naver") {
+//            getNaverEpisode().execute(link)
+//        }
 
-        oneEpisodeRecycler = findViewById(R.id.episode_image_list) as RecyclerView
-        var captureButton = findViewById(R.id.btn_capture) as FloatingActionButton
+
+
+
+        //oneEpisodeRecycler = findViewById(R.id.episode_image_list) as RecyclerView
+        webView = findViewById(R.id.episode)
+        webView.loadUrl(link)
+        webView.webChromeClient = WebChromeClient()
+        webView.webViewClient = WebViewClient()
+        var captureButton = findViewById<FloatingActionButton>(R.id.btn_capture)
         captureButton.setOnClickListener {
             var rootView: View = getWindow().getDecorView() //전체 화면
             var screenShot = ScreenShot(rootView)
@@ -88,7 +102,7 @@ class ShowEpisode: AppCompatActivity() {
         view.isDrawingCacheEnabled = false
         return file
     }
-
+/*
     @Suppress("DEPRECATION")
     inner class getNaverEpisode : AsyncTask<String?, Void?, String?>() {
 
@@ -115,6 +129,7 @@ class ShowEpisode: AppCompatActivity() {
             oneEpisodeRecycler.adapter = OneEpisodeAdapter(imageList, applicationContext)
         }
     }
+ */
 
     @Suppress("DEPRECATION")
     inner class SaveScreenShotJSONTask(capturePhotoPath : String?, UniqueID : String, webToonTitle: String, webToonThumbnail : String, mContext : Context?) : AsyncTask<String?, String?, String?>() {
