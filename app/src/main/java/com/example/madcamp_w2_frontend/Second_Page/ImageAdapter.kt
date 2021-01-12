@@ -51,6 +51,7 @@ class ImageAdapter(val imageList:ArrayList<image_item>, val captureList: ArrayLi
                         var currentCaptureList : capture = captureList[i]
                         if (currentCaptureList.title == item.webtoonTitle) {
                             var uriList = currentCaptureList.uriList
+                            intent.putExtra("webtoonTitle", item.webtoonTitle)
                             intent.putExtra("captureUriList", uriList)
                         }
                     }
