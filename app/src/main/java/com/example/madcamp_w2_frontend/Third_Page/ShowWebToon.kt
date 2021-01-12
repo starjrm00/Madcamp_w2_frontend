@@ -9,6 +9,7 @@ import android.util.Base64
 import android.util.Log
 import android.view.MotionEvent
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,6 +43,8 @@ class ShowWebToon: AppCompatActivity() {
         }
 
         episodeRecycler = findViewById(R.id.episode_list) as RecyclerView
+        var webtoonTitleView = findViewById(R.id.episode_title) as TextView
+        webtoonTitleView.setText(webToonTitle)
 
     }
 
