@@ -21,7 +21,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.madcamp_w2_frontend.MainActivity
 import com.example.madcamp_w2_frontend.R
+import com.example.madcamp_w2_frontend.Second_Page.Fragment2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.json.JSONObject
 import org.jsoup.Jsoup

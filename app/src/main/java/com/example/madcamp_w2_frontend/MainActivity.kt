@@ -3,6 +3,8 @@ package com.example.madcamp_w2_frontend
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import com.example.madcamp_w2_frontend.Second_Page.Fragment2
 import kotlinx.android.synthetic.main.activity_main.*
 

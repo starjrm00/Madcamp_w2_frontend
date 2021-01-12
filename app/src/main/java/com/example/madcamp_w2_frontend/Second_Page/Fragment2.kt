@@ -24,6 +24,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.madcamp_w2_frontend.*
 import com.facebook.AccessToken
 import com.facebook.login.LoginManager
@@ -36,7 +37,7 @@ import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
 
-class Fragment2(UniqueID: String) : Fragment() {
+class Fragment2(UniqueID: String) : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var callback: OnBackPressedCallback
     lateinit var recyclerView2 : RecyclerView
     var image_list = ArrayList<image_item>()
@@ -60,11 +61,12 @@ class Fragment2(UniqueID: String) : Fragment() {
         getCaptureFromDB()
         recyclerView2.adapter = ImageAdapter(image_list, capture_list, UniqueID)
         recyclerView2.setHasFixedSize(true)
-        refreshFragment(this, parentFragmentManager)
         return rootView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        SwipeRefresh.setOnRefreshListener(this)
 
         image_add_button.setOnClickListener {
             toggleFab()
@@ -101,8 +103,6 @@ class Fragment2(UniqueID: String) : Fragment() {
                 var changedUri: Uri = BitmapToUri(this.requireContext(), bitmap)
                 saveImageinMongod(changedUri)
             }
-
-            refreshFragment(this, parentFragmentManager)
         }
     }
     fun BitmapToUri(context: Context, bitmap: Bitmap): Uri {
@@ -450,8 +450,16 @@ class Fragment2(UniqueID: String) : Fragment() {
         callback.remove()
     }
 
-    fun refreshFragment(fragment: Fragment, fragmentManager: FragmentManager){
+    fun refreshFragment(){
+        var fragmentManager:FragmentManager = parentFragmentManager
+
         var ft: FragmentTransaction = fragmentManager.beginTransaction()
-        ft.detach(fragment).attach(fragment).commit()
+        ft.detach(this).attach(this).commit()
+        Log.d("refresh", "refresh")
+    }
+
+    override fun onRefresh() {
+        refreshFragment()
+        SwipeRefresh.isRefreshing = false
     }
 }
