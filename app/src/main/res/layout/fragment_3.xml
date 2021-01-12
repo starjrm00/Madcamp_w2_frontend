@@ -7,6 +7,17 @@
     android:layout_height="match_parent"
     tools:context=".Fragment3_for_favorite">
 
+    <WebView
+        android:id="@+id/crawler1"
+        android:layout_width="1dp"
+        android:layout_height="1dp" />
+
+
+    <WebView
+        android:id="@+id/crawler2"
+        android:layout_width="1dp"
+        android:layout_height="1dp" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/webtoon_image_for_favorite"
         android:layout_width="match_parent"
@@ -14,7 +25,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" >
+
+    </androidx.recyclerview.widget.RecyclerView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_favorite"

@@ -1,31 +1,35 @@
 package com.example.madcamp_w2_frontend
 
-import android.os.AsyncTask
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
+import android.webkit.JavascriptInterface
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.Button
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import org.json.JSONObject
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.jsoup.nodes.TextNode
-import org.jsoup.select.Elements
-import android.view.Window
-import android.widget.Button
-import androidx.activity.OnBackPressedCallback
 import com.example.madcamp_w2_frontend.Third_Page.WebToon
 import com.example.madcamp_w2_frontend.Third_Page.WebToonAdapter
 import com.facebook.AccessToken
 import com.facebook.login.LoginManager
 import kotlinx.android.synthetic.main.fragment_3.*
+import org.json.JSONObject
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.TextNode
+import org.jsoup.select.Elements
 import java.io.*
+import java.lang.Thread.sleep
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
@@ -35,14 +39,17 @@ class Fragment3(UniqueID: String) : Fragment() {
     val serverip = "http://192.249.18.212:3000"
     var webToonList : MutableList<WebToon> = ArrayList()
     var favorite = ArrayList<String>()
+    lateinit var document: Document
     lateinit var imageRecycler : RecyclerView
     val UniqueID = UniqueID
+    lateinit var webView1: WebView
+    lateinit var webView2: WebView
 
     private lateinit var callback: OnBackPressedCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        JSONTask_get_favorite(requireContext(), UniqueID).execute(serverip+"/get_favorite")
+        JSONTask_get_favorite(requireContext(), UniqueID).execute(serverip + "/get_favorite")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -63,6 +70,34 @@ class Fragment3(UniqueID: String) : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_3, container, false)
+        imageRecycler = rootView.findViewById(R.id.webtoon_image_for_favorite) as RecyclerView
+        webView1 = rootView.findViewById(R.id.crawler1)
+        webView2 = rootView.findViewById(R.id.crawler2)
+        //WebView 자바스크립트 활성화
+        webView1.settings.javaScriptEnabled = true
+        webView2.settings.javaScriptEnabled = true
+        // 자바스크립트인터페이스 연결
+        // 이걸 통해 자바스크립트 내에서 자바함수에 접근할 수 있음.
+        webView1.addJavascriptInterface(crawlingLezhin(), "Android")
+        //webView2.addJavascriptInterface(crawlingDaum(), "Android")
+        // 페이지가 모두 로드되었을 때, 작업 정의
+        webView1.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView, url: String) {
+                super.onPageFinished(view, url)
+                // 자바스크립트 인터페이스로 연결되어 있는 getHTML를 실행
+                // 자바스크립트 기본 메소드로 html 소스를 통째로 지정해서 인자로 넘김
+                view.loadUrl("javascript:window.Android.getHtml(document.getElementsByTagName('body')[0].innerHTML);")
+            }
+        }
+        webView2.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView, url: String) {
+                super.onPageFinished(view, url)
+                // 자바스크립트 인터페이스로 연결되어 있는 getHTML를 실행
+                // 자바스크립트 기본 메소드로 html 소스를 통째로 지정해서 인자로 넘김
+                view.loadUrl("javascript:window.Android.getHtml(document.getElementsByTagName('body')[0].innerHTML);")
+            }
+        }
+
         val naverComic = "https://comic.naver.com/webtoon/weekday.nhn"
         getNaverData().execute(naverComic)
 
@@ -76,15 +111,18 @@ class Fragment3(UniqueID: String) : Fragment() {
         }*/
 
         //Lezhin Webtoon
-        /*
         val lezhinComic = "https://www.lezhin.com/ko/scheduled?day=1"
-        getLezhinData().execute(lezhinComic)
-        */
+        getLezhinData(lezhinComic+"day=1")
 
-        imageRecycler = rootView.findViewById(R.id.webtoon_image_for_favorite) as RecyclerView
+        try {
+            sleep(10000)
+        }catch(e:InterruptedException){
+            e.printStackTrace()
+        }
         imageRecycler.layoutManager = GridLayoutManager(this.context, 3)
         imageRecycler.adapter = WebToonAdapter(webToonList, UniqueID, context)
         imageRecycler.setHasFixedSize(true)
+        Log.d("make recycler", "Now finish make recyclerView")
         return rootView
     }
 
@@ -95,7 +133,7 @@ class Fragment3(UniqueID: String) : Fragment() {
         // String 으로 값을 전달받은 값을 처리하고, Boolean 으로 doInBackground 결과를 넘겨준다.
         override fun doInBackground(vararg params: String?) : String? {
             try {
-                val document: Document = Jsoup.connect(params[0]).get()
+                document = Jsoup.connect(params[0]).get()
                 //title 읽어오기 + link 읽어오기
                 val titleElements : Elements = document.select("div.col_inner ul li a.title")
                 var titleList : MutableList<String> = ArrayList()
@@ -121,10 +159,26 @@ class Fragment3(UniqueID: String) : Fragment() {
 
                 for (index in titleList.indices) {
                     if(titleList[index] in favorite){
-                        webToonList.add(WebToon("Naver", titleList[index], imageList[index], linkList[index], true))
+                        webToonList.add(
+                            WebToon(
+                                "Naver",
+                                titleList[index],
+                                imageList[index],
+                                linkList[index],
+                                true
+                            )
+                        )
                     }
                     else{
-                        webToonList.add(WebToon("Naver", titleList[index], imageList[index], linkList[index], false))
+                        webToonList.add(
+                            WebToon(
+                                "Naver",
+                                titleList[index],
+                                imageList[index],
+                                linkList[index],
+                                false
+                            )
+                        )
                     }
                 }
 
@@ -172,10 +226,26 @@ class Fragment3(UniqueID: String) : Fragment() {
                 Log.i("NaverLink", linkElements.toString())
                 for (index in titleList.indices) {
                     if(titleList[index] in favorite){
-                        webToonList.add(WebToon("Daum", titleList[index], imageList[index], linkList[index], true))
+                        webToonList.add(
+                            WebToon(
+                                "Daum",
+                                titleList[index],
+                                imageList[index],
+                                linkList[index],
+                                true
+                            )
+                        )
                     }
                     else{
-                        webToonList.add(WebToon("Daum", titleList[index], imageList[index], linkList[index], false))
+                        webToonList.add(
+                            WebToon(
+                                "Daum",
+                                titleList[index],
+                                imageList[index],
+                                linkList[index],
+                                false
+                            )
+                        )
                     }
                 }
             } catch (e: IOException) {
@@ -185,8 +255,12 @@ class Fragment3(UniqueID: String) : Fragment() {
         }
     }
 
+    fun getLezhinData(link: String) {
+        webView1.loadUrl(link)
+    }
+
     @Suppress("DEPRECATION")
-    inner class JSONTask_get_favorite(mContext : Context, UniqueID: String) : AsyncTask<String?, String?, String>(){
+    inner class JSONTask_get_favorite(mContext: Context, UniqueID: String) : AsyncTask<String?, String?, String>(){
         var mContext = mContext
         var UniqueID = UniqueID
         override fun doInBackground(vararg params: String?): String? {
@@ -226,15 +300,15 @@ class Fragment3(UniqueID: String) : Fragment() {
                     }
 
                     return buffer.toString()
-                }catch(e: MalformedURLException){
+                }catch (e: MalformedURLException){
                     e.printStackTrace()
-                }catch(e: IOException){
+                }catch (e: IOException){
                     e.printStackTrace()
                 }finally {
                     con?.disconnect()
                     try{
                         reader?.close()
-                    }catch(e: IOException){
+                    }catch (e: IOException){
                         e.printStackTrace()
                     }
                 }
@@ -290,5 +364,47 @@ class Fragment3(UniqueID: String) : Fragment() {
     override fun onDetach() {
         super.onDetach()
         callback.remove()
+    }
+
+    inner class crawlingLezhin {
+        @JavascriptInterface
+        fun getHtml(html: String) {
+            //위 자바스크립트가 호출되면 여기로 html이 반환됨
+            document = Jsoup.parse(html)
+            //title 읽어오기
+            //Log.i("lezhinTest", document.toString())
+            //Log.i("lezhinTest?", "lala")
+            val titleElements: Elements = document.select("ul.lzComic__list li a div div.lzComic__title")
+            //Log.i("lezhinTestDiv", titleElements.toString())
+            var titleList: MutableList<String> = ArrayList()
+            for (e in titleElements) {
+                val text: String = (e.childNode(0) as TextNode).wholeText
+                Log.i("title", text)
+                titleList.add(text)
+            }
+            //썸네일 이미지 url 읽어오기
+            var imageList: MutableList<String> = ArrayList()
+            val imageElements: Elements = document.select("ul.lzComic__list li a div picture img")
+            for (i in imageElements) {
+                val imageUrl: String = i.attr("src")
+                imageList.add(imageUrl)
+            }
+            //세부 링크 url 읽어오기
+            var linkList : MutableList<String> = ArrayList()
+            val linkElements : Elements = document.select("ul.lzComic__list li a")
+            for (i in linkElements){
+                val link: String = i.attr("href")
+                linkList.add("https://www.lezhin.com"+link)
+                Log.i("LezhinLink", link)
+            }
+            //Log.i("LezhinLink", linkElements.toString())
+            for (index in titleList.indices) {
+                if(titleList[index] in favorite){
+                    webToonList.add(WebToon("Lezhin", titleList[index], imageList[index], linkList[index], true ))
+                } else{
+                    webToonList.add(WebToon("Lezhin", titleList[index], imageList[index], linkList[index], false))
+                }
+            }
+        }
     }
 }
