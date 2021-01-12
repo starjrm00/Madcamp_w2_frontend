@@ -3,6 +3,7 @@ package com.example.madcamp_w2_frontend.Third_Page
 import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,6 +43,7 @@ class WebToonAdapter_for_favorite(val WebToonList:MutableList<WebToon>, val Uniq
                     intent.putExtra("site", item.site)
                     intent.putExtra("uniqueID", UniqueID)
                     intent.putExtra("webToonTitle", item.title)
+                    intent.putExtra("webToonThumbnail", item.ImageUrl)
                     v?.context?.startActivity(intent)
                 }
             })
