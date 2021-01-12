@@ -150,6 +150,7 @@ class ShowEpisode: AppCompatActivity() {
                 var webToonThumbnailBitmap : Bitmap = Glide.with(mContext!!).asBitmap().load(webToonThumbnail).submit().get()
                 var thumbnailBitmapString : String? = BitmapToString(webToonThumbnailBitmap)
                 jsonObject.accumulate("webToonThumbnailBitmap", thumbnailBitmapString)
+                jsonObject.accumulate("isCapture", true)
                 var con: HttpURLConnection? = null
                 var reader: BufferedReader? = null
                 Log.d("JSONTask", "in 1st try")
