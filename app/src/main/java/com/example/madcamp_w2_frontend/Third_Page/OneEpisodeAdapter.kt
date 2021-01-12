@@ -17,7 +17,7 @@ class OneEpisodeAdapter(val imageList:MutableList<String>, context: Context):
     val mContext = context
 
     class viewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
-        val imageInEpi = itemView.findViewById(R.id.image_in_episode) as ImageView
+        //val imageInEpi = itemView.findViewById(R.id.image_in_episode) as ImageView
         //val imageInEpi = itemView.findViewById(R.id.image_in_episode) as TextView
     }
 
@@ -33,7 +33,7 @@ class OneEpisodeAdapter(val imageList:MutableList<String>, context: Context):
         //holder.imageInEpi.setText(imageList.get(position))
         //TODO(server에서 episode 사진 가져오기)
         if (mContext != null) {
-            Glide.with(mContext).load(imageList.get(position)).into(holder.imageInEpi)
+            //Glide.with(mContext).load(imageList.get(position)).into(holder.imageInEpi)
         }
 
         /*
