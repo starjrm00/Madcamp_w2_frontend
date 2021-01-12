@@ -48,6 +48,7 @@ class EpisodeAdapter(val epiList:MutableList<Episode>, context:Context, uniqueID
                 intent.putExtra("site", item.site)
                 intent.putExtra("uniqueID", uniqueID)
                 intent.putExtra("webToonTitle", item.webToonTitle)
+                intent.putExtra("webToonThumbnail", item.webToonThumbnail)
 
                 v?.context?.startActivity(intent)
             }

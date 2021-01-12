@@ -7,24 +7,21 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.madcamp_w2_frontend.R
-import com.example.madcamp_w2_frontend.Second_Page.Fragment2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import java.io.*
-import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
@@ -46,6 +43,7 @@ class ShowEpisode: AppCompatActivity() {
         var site : String = intent.getStringExtra("site")!!
         var link : String = intent.getStringExtra("link" )!!
         var webToonTitle : String = intent.getStringExtra("webToonTitle")!!
+        var webToonThumbnail : String = intent.getStringExtra("webToonThumbnail")!!
         UniqueID = intent.getStringExtra("uniqueID")!!
         if (site == "Naver") {
             getNaverEpisode().execute(link)
@@ -60,24 +58,15 @@ class ShowEpisode: AppCompatActivity() {
                 sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(screenShot)))
             }
             Toast.makeText(applicationContext, "현재 화면을 캡처하였습니다.", Toast.LENGTH_SHORT).show()
-            //TODO(캡처 화면 DB에 저장하기)
-            saveImageinMongod(screenShot, webToonTitle)
+            saveImageinMongod(screenShot, webToonTitle, webToonThumbnail)
         }
 
     }
 
-    fun saveImageinMongod(screenShotFile : File?, webToonTitle: String) {
+    fun saveImageinMongod(screenShotFile : File?, webToonTitle: String, webToonThumbnail: String) {
         var currentPhotoPath = screenShotFile?.absolutePath
-        var jsonTask = SaveScreenShotJSONTask(currentPhotoPath, UniqueID, webToonTitle, applicationContext)
+        var jsonTask = SaveScreenShotJSONTask(currentPhotoPath, UniqueID, webToonTitle, webToonThumbnail, applicationContext)
         jsonTask.execute(serverip+"/saveScreenShot")
-    }
-
-    fun BitmapToString(bitmap: Bitmap): String? {
-        val baos =
-            ByteArrayOutputStream() //바이트 배열을 차례대로 읽어 들이기위한 ByteArrayOutputStream클래스 선언
-        bitmap.compress(Bitmap.CompressFormat.PNG, 70, baos) //bitmap을 압축 (숫자 70은 70%로 압축한다는 뜻)
-        val bytes = baos.toByteArray() //해당 bitmap을 byte배열로 바꿔준다.
-        return Base64.encodeToString(bytes, Base64.DEFAULT) //String을 retrurn
     }
 
     fun ScreenShot(view: View) : File? {
@@ -128,11 +117,12 @@ class ShowEpisode: AppCompatActivity() {
     }
 
     @Suppress("DEPRECATION")
-    inner class SaveScreenShotJSONTask(capturePhotoPath : String?, UniqueID : String, webToonTitle: String, mContext : Context?) : AsyncTask<String?, String?, String?>() {
+    inner class SaveScreenShotJSONTask(capturePhotoPath : String?, UniqueID : String, webToonTitle: String, webToonThumbnail : String, mContext : Context?) : AsyncTask<String?, String?, String?>() {
         var capturePhotoPath = capturePhotoPath
         var UniqueID = UniqueID
         var mContext = mContext
         var webToonTitle = webToonTitle
+        var webToonThumbnail = webToonThumbnail
 
         override fun doInBackground(vararg params: String?): String? {
             try {
@@ -141,6 +131,10 @@ class ShowEpisode: AppCompatActivity() {
                 jsonObject.accumulate("_id", UniqueID)
                 jsonObject.accumulate("captureUri", capturePhotoPath)
                 jsonObject.accumulate("webToonTitle", webToonTitle)
+                //TODO(webToonThumbnail이 원래 string 형태 url인데 이거 bitmap으로 바꾸기)
+                var webToonThumbnailBitmap : Bitmap = Glide.with(mContext!!).asBitmap().load(webToonThumbnail).submit().get()
+                var thumbnailBitmapString : String? = BitmapToString(webToonThumbnailBitmap)
+                jsonObject.accumulate("webToonThumbnailBitmap", thumbnailBitmapString)
                 var con: HttpURLConnection? = null
                 var reader: BufferedReader? = null
                 Log.d("JSONTask", "in 1st try")
@@ -208,5 +202,12 @@ class ShowEpisode: AppCompatActivity() {
                 Toast.makeText(mContext, "DB 업로드에 실패하였습니다.", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    fun BitmapToString(bitmap: Bitmap): String? {
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 70, baos)
+        val bytes = baos.toByteArray()
+        return Base64.encodeToString(bytes, Base64.DEFAULT)
     }
 }

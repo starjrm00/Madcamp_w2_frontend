@@ -24,10 +24,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.madcamp_w2_frontend.ImageAdapter
-import com.example.madcamp_w2_frontend.R
-import com.example.madcamp_w2_frontend.image_item
-import com.example.madcamp_w2_frontend.list_item
+import com.example.madcamp_w2_frontend.*
 import com.facebook.AccessToken
 import com.facebook.login.LoginManager
 import kotlinx.android.synthetic.main.fragment_1.*
@@ -43,6 +40,7 @@ class Fragment2(UniqueID: String) : Fragment() {
     private lateinit var callback: OnBackPressedCallback
     lateinit var recyclerView2 : RecyclerView
     var image_list = ArrayList<image_item>()
+    var capture_list = ArrayList<capture>()
     private val pickImage = 100
     private val capturePhoto = 101
     private var imageUri:Uri? = null
@@ -59,6 +57,7 @@ class Fragment2(UniqueID: String) : Fragment() {
         recyclerView2 = rootView.findViewById(R.id.rv_image)as RecyclerView
         recyclerView2.layoutManager = GridLayoutManager(this.context,3)
         getImageFromDB()
+        getCaptureFromDB()
         recyclerView2.adapter = ImageAdapter(image_list, UniqueID)
         recyclerView2.setHasFixedSize(true)
         return rootView
@@ -166,6 +165,11 @@ class Fragment2(UniqueID: String) : Fragment() {
         jsonTask.execute(serverip + "/getImages")
     }
 
+    fun getCaptureFromDB() {
+        var jsonTask = JSONTask_get_capture(UniqueID, context)
+        jsonTask.execute(serverip+"/getScreenShot")
+    }
+
     @Suppress("DEPRECATION")
     inner class JSONTask_get_image(UniqueID: String, mContext : Context?) : AsyncTask<String?, String?, String>(){
         var mContext = mContext
@@ -235,6 +239,97 @@ class Fragment2(UniqueID: String) : Fragment() {
             for(i in 0 until jArray.length()){
                 val obj = jArray.getJSONObject(i)
                 image_list.add(image_item(obj.getString("_id"), obj.getString("imageBitmap")))
+            }
+
+            recyclerView2.adapter?.notifyDataSetChanged()
+            recyclerView2.setHasFixedSize(true)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    inner class JSONTask_get_capture(UniqueID: String, mContext : Context?) : AsyncTask<String?, String?, String>(){
+        var mContext = mContext
+        var UniqueID = UniqueID
+        override fun doInBackground(vararg params: String?): String? {
+            try{
+                var jsonObject = JSONObject()
+                jsonObject.accumulate("_id", UniqueID)
+                var con: HttpURLConnection? = null
+                var reader: BufferedReader? = null
+                try{
+                    var url = URL(params[0])
+                    con = url.openConnection() as HttpURLConnection
+                    con.requestMethod = "POST"
+                    con!!.setRequestProperty("Cache-Control", "no-cache")
+                    con.setRequestProperty(
+                        "Content-Type",
+                        "application/json"
+                    )
+                    con.setRequestProperty("Accept", "text/html")
+                    con.doInput = true
+                    con.doOutput = true
+                    con.connect()
+
+                    val outStream = con.outputStream
+                    val writer =
+                        BufferedWriter(OutputStreamWriter(outStream))
+                    writer.write(jsonObject.toString())
+                    writer.flush()
+                    writer.close()
+
+
+                    val stream = con.inputStream
+                    reader = BufferedReader(InputStreamReader(stream))
+                    val buffer = StringBuffer()
+                    var line: String? = ""
+                    while(reader.readLine().also{line = it} != null){
+                        buffer.append(line)
+                    }
+
+                    return buffer.toString()
+                }catch(e: MalformedURLException){
+                    e.printStackTrace()
+                }catch(e: IOException){
+                    e.printStackTrace()
+                }finally {
+                    con?.disconnect()
+                    try{
+                        reader?.close()
+                    }catch(e: IOException){
+                        e.printStackTrace()
+                    }
+                }
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+            return null
+        }
+        override fun onPostExecute(result: String?) {
+            super.onPostExecute(result)
+            Log.i("test", "1")
+            val jObject = JSONObject(result)
+            Log.d("result log", result!!)
+            val jArray = jObject.getJSONArray("capture")
+            capture_list.clear()
+
+            for(i in 0 until jArray.length()){
+                val obj = jArray.getJSONObject(i)
+                var checked = false
+                for(i in 0 until capture_list.size) {
+                    //현재 capture_list에 있는 타이틀일 경우
+                    var current_webtoon_captures : capture = capture_list[i]
+                    if (current_webtoon_captures.title == obj.getString("webToonTitle")) {
+                        current_webtoon_captures.uriList.add(obj.getString("captureUri"))
+                        checked = true
+                    }
+                }
+                //현재 capture_list에 없는 타이틀일 경우
+                if (!checked) {
+                    capture_list.add(
+                        capture(obj.getString("webToonTitle"), arrayListOf(obj.getString("captureUri")))
+                    )
+                    //image_list.add(obj.getString())
+                }
             }
 
             recyclerView2.adapter?.notifyDataSetChanged()
