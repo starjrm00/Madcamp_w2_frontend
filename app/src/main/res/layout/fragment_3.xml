@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     tools:context=".Fragment3_for_favorite">
 
-    <WebView
+    <!--<WebView
         android:id="@+id/crawler1"
         android:layout_width="1dp"
         android:layout_height="1dp" />
@@ -17,7 +17,7 @@
     <WebView
         android:id="@+id/crawler2"
         android:layout_width="1dp"
-        android:layout_height="1dp" />
+        android:layout_height="1dp" />-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/webtoon_image_for_favorite"

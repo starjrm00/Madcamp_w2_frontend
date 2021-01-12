@@ -71,32 +71,32 @@ class Fragment3(UniqueID: String) : Fragment() {
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_3, container, false)
         imageRecycler = rootView.findViewById(R.id.webtoon_image_for_favorite) as RecyclerView
-        webView1 = rootView.findViewById(R.id.crawler1)
-        webView2 = rootView.findViewById(R.id.crawler2)
+//        webView1 = rootView.findViewById(R.id.crawler1)
+//        webView2 = rootView.findViewById(R.id.crawler2)
         //WebView 자바스크립트 활성화
-        webView1.settings.javaScriptEnabled = true
-        webView2.settings.javaScriptEnabled = true
+//        webView1.settings.javaScriptEnabled = true
+//        webView2.settings.javaScriptEnabled = true
         // 자바스크립트인터페이스 연결
         // 이걸 통해 자바스크립트 내에서 자바함수에 접근할 수 있음.
-        webView1.addJavascriptInterface(crawlingLezhin(), "Android")
+//        webView1.addJavascriptInterface(crawlingLezhin(), "Android")
         //webView2.addJavascriptInterface(crawlingDaum(), "Android")
         // 페이지가 모두 로드되었을 때, 작업 정의
-        webView1.webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView, url: String) {
-                super.onPageFinished(view, url)
+//        webView1.webViewClient = object : WebViewClient() {
+//            override fun onPageFinished(view: WebView, url: String) {
+//                super.onPageFinished(view, url)
                 // 자바스크립트 인터페이스로 연결되어 있는 getHTML를 실행
                 // 자바스크립트 기본 메소드로 html 소스를 통째로 지정해서 인자로 넘김
-                view.loadUrl("javascript:window.Android.getHtml(document.getElementsByTagName('body')[0].innerHTML);")
-            }
-        }
-        webView2.webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView, url: String) {
-                super.onPageFinished(view, url)
+//                view.loadUrl("javascript:window.Android.getHtml(document.getElementsByTagName('body')[0].innerHTML);")
+//            }
+//        }
+//        webView2.webViewClient = object : WebViewClient() {
+//            override fun onPageFinished(view: WebView, url: String) {
+//                super.onPageFinished(view, url)
                 // 자바스크립트 인터페이스로 연결되어 있는 getHTML를 실행
                 // 자바스크립트 기본 메소드로 html 소스를 통째로 지정해서 인자로 넘김
-                view.loadUrl("javascript:window.Android.getHtml(document.getElementsByTagName('body')[0].innerHTML);")
-            }
-        }
+//                view.loadUrl("javascript:window.Android.getHtml(document.getElementsByTagName('body')[0].innerHTML);")
+//            }
+//        }
 
         val naverComic = "https://comic.naver.com/webtoon/weekday.nhn"
         getNaverData().execute(naverComic)
@@ -111,14 +111,14 @@ class Fragment3(UniqueID: String) : Fragment() {
         }*/
 
         //Lezhin Webtoon
-        val lezhinComic = "https://www.lezhin.com/ko/scheduled?day=1"
-        getLezhinData(lezhinComic+"day=1")
-
-        try {
-            sleep(10000)
-        }catch(e:InterruptedException){
-            e.printStackTrace()
-        }
+//        val lezhinComic = "https://www.lezhin.com/ko/scheduled?day=1"
+//        getLezhinData(lezhinComic+"day=1")
+//
+//        try {
+//            sleep(10000)
+//        }catch(e:InterruptedException){
+//            e.printStackTrace()
+//        }
         imageRecycler.layoutManager = GridLayoutManager(this.context, 3)
         imageRecycler.adapter = WebToonAdapter(webToonList, UniqueID, context)
         imageRecycler.setHasFixedSize(true)
@@ -196,7 +196,7 @@ class Fragment3(UniqueID: String) : Fragment() {
             imageRecycler.adapter = WebToonAdapter(webToonList, UniqueID, context)
         }
     }
-
+/*
     @Suppress("DEPRECATION")
     inner class getDaumData : AsyncTask<String?, Void?, String?>() {
 
@@ -258,7 +258,7 @@ class Fragment3(UniqueID: String) : Fragment() {
     fun getLezhinData(link: String) {
         webView1.loadUrl(link)
     }
-
+*/
     @Suppress("DEPRECATION")
     inner class JSONTask_get_favorite(mContext: Context, UniqueID: String) : AsyncTask<String?, String?, String>(){
         var mContext = mContext
@@ -365,7 +365,7 @@ class Fragment3(UniqueID: String) : Fragment() {
         super.onDetach()
         callback.remove()
     }
-
+/*
     inner class crawlingLezhin {
         @JavascriptInterface
         fun getHtml(html: String) {
@@ -407,4 +407,5 @@ class Fragment3(UniqueID: String) : Fragment() {
             }
         }
     }
+    */
 }
