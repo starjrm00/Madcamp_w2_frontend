@@ -47,6 +47,7 @@ class EpisodeAdapter(val epiList:MutableList<Episode>, context:Context, uniqueID
                 intent.putExtra("link", item.link)
                 intent.putExtra("site", item.site)
                 intent.putExtra("uniqueID", uniqueID)
+                intent.putExtra("webToonTitle", item.webToonTitle)
 
                 v?.context?.startActivity(intent)
             }
