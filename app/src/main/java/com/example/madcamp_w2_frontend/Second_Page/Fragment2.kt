@@ -60,7 +60,6 @@ class Fragment2(UniqueID: String) : Fragment() {
         getCaptureFromDB()
         recyclerView2.adapter = ImageAdapter(image_list, capture_list, UniqueID)
         recyclerView2.setHasFixedSize(true)
-        refreshFragment(this, parentFragmentManager)
         return rootView
     }
 

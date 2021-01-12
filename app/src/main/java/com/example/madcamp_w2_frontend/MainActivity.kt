@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
         adapter.addFragment(Fragment2(UniqueID), "Tab2")
         adapter.addFragment(Fragment3(UniqueID), "Tab3")
 
+        viewPager.offscreenPageLimit = 1
         viewPager.adapter = adapter
         tabLayout.setupWithViewPager(viewPager)
     }
