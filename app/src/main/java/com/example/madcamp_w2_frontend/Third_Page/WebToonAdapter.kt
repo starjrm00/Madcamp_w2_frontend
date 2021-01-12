@@ -34,11 +34,11 @@ class WebToonAdapter(val WebToonList:MutableList<WebToon>, val UniqueID : String
     class viewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val image = itemView.findViewById<ImageView>(R.id.webtoon_thumbnail)
         val title = itemView.findViewById<TextView>(R.id.webtoon_title)
+        val favorite_btn: CheckBox = itemView.findViewById(R.id.favorite)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): viewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.webtoon_item, parent, false)
-        var favoriteButton : CheckBox = view.findViewById(R.id.favorite)
 
         return viewHolder(view).apply{
             itemView.setOnClickListener(object:View.OnClickListener{
@@ -52,7 +52,7 @@ class WebToonAdapter(val WebToonList:MutableList<WebToon>, val UniqueID : String
                     v?.context?.startActivity(intent)
                 }
             })
-            favoriteButton.setOnClickListener { v ->
+            favorite_btn.setOnClickListener { v ->
                 val curPos: Int = adapterPosition
                 val item: WebToon = WebToonList.get(curPos)
                 if (v is CheckBox) {
@@ -64,21 +64,6 @@ class WebToonAdapter(val WebToonList:MutableList<WebToon>, val UniqueID : String
                         jsonTask.execute(serverip+"/remove_favorite")
                     }
                 }
-            }
-            if (favoriteButton.isChecked) {
-                val curPos: Int = adapterPosition
-                var item : WebToon = WebToonList.get(curPos)
-                //TODO(favorite list에 더하기)
-                /*
-                var intent: Intent = Intent(context, SaveFavorite::class.java)
-                intent.putExtra("site", item.site)
-                intent.putExtra("title", item.title)
-                intent.putExtra("url", item.ImageUrl)
-                intent.putExtra("link", item.link)
-                context?.startActivity(intent)*/
-            } else {
-                //TODO(favorite list에서 삭제하기)
-
             }
         }
     }
@@ -209,9 +194,12 @@ class WebToonAdapter(val WebToonList:MutableList<WebToon>, val UniqueID : String
 
     override fun onBindViewHolder(holder: viewHolder, position: Int) {
         if (mContext != null) {
-            Glide.with(mContext).load(WebToonList.get(position).ImageUrl).into(holder.image)
+            Glide.with(mContext).load(WebToonList[position].ImageUrl).into(holder.image)
         }
-        holder.title?.setText(WebToonList.get(position).title)
+        holder.title?.setText(WebToonList[position].title)
+        if(WebToonList[position].favorite){
+            holder.favorite_btn.isChecked = true
+        }
     }
 
     override fun getItemCount(): Int {
