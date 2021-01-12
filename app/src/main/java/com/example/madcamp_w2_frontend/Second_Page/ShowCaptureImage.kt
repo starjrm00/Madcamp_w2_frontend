@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -26,8 +27,11 @@ class ShowCaptureImage: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.capture_image)
+        val webtoonTitle = intent.getStringExtra("webtoonTitle")
         uriList = intent.getStringArrayListExtra("captureUriList")!!
         uriRecycler = findViewById(R.id.capture_image_recycler) as RecyclerView
+        var captureTitleView = findViewById(R.id.capture_title) as TextView
+        captureTitleView.setText(webtoonTitle)
         uriRecycler.layoutManager = GridLayoutManager(this, 3)
         uriRecycler.adapter = CaptureAdapter(uriList, applicationContext)
     }

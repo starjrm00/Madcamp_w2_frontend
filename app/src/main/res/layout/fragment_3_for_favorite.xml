@@ -17,7 +17,8 @@
         android:layout_marginStart="10dp"
         android:textSize="40dp"
         android:fontFamily="@font/tvn_bold"
-        android:text="TextView" />
+        android:text="TextView"
+        android:layout_marginBottom="15dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/webtoon_image_for_favorite"
