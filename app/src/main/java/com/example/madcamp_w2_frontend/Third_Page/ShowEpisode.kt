@@ -45,11 +45,10 @@ class ShowEpisode: AppCompatActivity() {
         var webToonTitle : String = intent.getStringExtra("webToonTitle")!!
         var webToonThumbnail : String = intent.getStringExtra("webToonThumbnail")!!
         UniqueID = intent.getStringExtra("uniqueID")!!
+        oneEpisodeRecycler = findViewById(R.id.episode_image_list) as RecyclerView
         if (site == "Naver") {
             getNaverEpisode().execute(link)
         }
-
-        oneEpisodeRecycler = findViewById(R.id.episode_image_list) as RecyclerView
         var captureButton = findViewById(R.id.btn_capture) as FloatingActionButton
         captureButton.setOnClickListener {
             var rootView: View = getWindow().getDecorView() //전체 화면
@@ -131,10 +130,10 @@ class ShowEpisode: AppCompatActivity() {
                 jsonObject.accumulate("_id", UniqueID)
                 jsonObject.accumulate("captureUri", capturePhotoPath)
                 jsonObject.accumulate("webToonTitle", webToonTitle)
-                //TODO(webToonThumbnail이 원래 string 형태 url인데 이거 bitmap으로 바꾸기)
                 var webToonThumbnailBitmap : Bitmap = Glide.with(mContext!!).asBitmap().load(webToonThumbnail).submit().get()
                 var thumbnailBitmapString : String? = BitmapToString(webToonThumbnailBitmap)
                 jsonObject.accumulate("webToonThumbnailBitmap", thumbnailBitmapString)
+                jsonObject.accumulate("isCapture", true)
                 var con: HttpURLConnection? = null
                 var reader: BufferedReader? = null
                 Log.d("JSONTask", "in 1st try")

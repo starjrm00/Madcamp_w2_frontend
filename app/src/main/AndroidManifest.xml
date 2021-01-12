@@ -40,6 +40,8 @@
         <activity android:name=".ShowBigImage"/>
         <activity android:name=".Third_Page.ShowWebToon"/>
         <activity android:name=".Third_Page.ShowEpisode"/>
+        <activity android:name=".Second_Page.ShowCaptureImage"/>
+        <activity android:name=".Second_Page.ShowBigCapture"/>
         <activity android:name=".MainActivity"/>
         <activity android:name=".Signup"/>
         <activity android:name=".Signin"/>

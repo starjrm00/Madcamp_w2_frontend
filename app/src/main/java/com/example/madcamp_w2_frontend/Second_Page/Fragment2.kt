@@ -58,7 +58,7 @@ class Fragment2(UniqueID: String) : Fragment() {
         recyclerView2.layoutManager = GridLayoutManager(this.context,3)
         getImageFromDB()
         getCaptureFromDB()
-        recyclerView2.adapter = ImageAdapter(image_list, UniqueID)
+        recyclerView2.adapter = ImageAdapter(image_list, capture_list, UniqueID)
         recyclerView2.setHasFixedSize(true)
         return rootView
     }
@@ -238,7 +238,7 @@ class Fragment2(UniqueID: String) : Fragment() {
 
             for(i in 0 until jArray.length()){
                 val obj = jArray.getJSONObject(i)
-                image_list.add(image_item(obj.getString("_id"), obj.getString("imageBitmap")))
+                image_list.add(image_item(obj.getString("_id"), obj.getString("imageBitmap"), obj.getBoolean("isCapture"), obj.getString("webtoonTitle")))
             }
 
             recyclerView2.adapter?.notifyDataSetChanged()
@@ -328,7 +328,7 @@ class Fragment2(UniqueID: String) : Fragment() {
                     capture_list.add(
                         capture(obj.getString("webToonTitle"), arrayListOf(obj.getString("captureUri")))
                     )
-                    //image_list.add(obj.getString())
+                    //TODO(image_list.add(obj.getString()))
                 }
             }
 
@@ -349,6 +349,8 @@ class Fragment2(UniqueID: String) : Fragment() {
                 //입력해둔 edittext의 id와 pw값을 받아와 put해줍니다 : 데이터를 json형식으로 바꿔 넣어주었습니다.
                 jsonObject.accumulate("_id", UniqueID)
                 jsonObject.accumulate("imageBitmap", bitmapString)
+                jsonObject.accumulate("isCapture", false)
+                jsonObject.accumulate("webtoonTitle", "")
                 var con: HttpURLConnection? = null
                 var reader: BufferedReader? = null
                 Log.d("JSONTask", "in 1st try")
