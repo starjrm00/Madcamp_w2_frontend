@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.madcamp_w2_frontend.R
 
 
@@ -16,8 +17,8 @@ class OneEpisodeAdapter(val imageList:MutableList<String>, context: Context):
     val mContext = context
 
     class viewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
-        //val imageInEpi = itemView.findViewById(R.id.image_in_episode) as ImageView
-        val imageInEpi = itemView.findViewById(R.id.image_in_episode) as TextView
+        val imageInEpi = itemView.findViewById(R.id.image_in_episode) as ImageView
+        //val imageInEpi = itemView.findViewById(R.id.image_in_episode) as TextView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): viewHolder {
@@ -29,11 +30,11 @@ class OneEpisodeAdapter(val imageList:MutableList<String>, context: Context):
 
 
     override fun onBindViewHolder(holder: viewHolder, position: Int) {
-        holder.imageInEpi.setText(imageList.get(position))
-        /*
+        //holder.imageInEpi.setText(imageList.get(position))
+        //TODO(server에서 episode 사진 가져오기)
         if (mContext != null) {
             Glide.with(mContext).load(imageList.get(position)).into(holder.imageInEpi)
-        }*/
+        }
 
         /*
         var bitmap : Bitmap? = null

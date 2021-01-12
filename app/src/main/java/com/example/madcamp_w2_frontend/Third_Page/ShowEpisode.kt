@@ -45,6 +45,7 @@ class ShowEpisode: AppCompatActivity() {
         setContentView(R.layout.one_episode)
         var site : String = intent.getStringExtra("site")!!
         var link : String = intent.getStringExtra("link" )!!
+        var webToonTitle : String = intent.getStringExtra("webToonTitle")!!
         UniqueID = intent.getStringExtra("uniqueID")!!
         if (site == "Naver") {
             getNaverEpisode().execute(link)
@@ -54,41 +55,34 @@ class ShowEpisode: AppCompatActivity() {
         var captureButton = findViewById(R.id.btn_capture) as FloatingActionButton
         captureButton.setOnClickListener {
             var rootView: View = getWindow().getDecorView() //전체 화면
-            var screenBitmap : Bitmap = shot(rootView)
-            var screenShot = ScreenShot(screenBitmap)
-            rootView.isDrawingCacheEnabled = false
+            var screenShot = ScreenShot(rootView)
             if (screenShot != null) {
                 sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(screenShot)))
             }
             Toast.makeText(applicationContext, "현재 화면을 캡처하였습니다.", Toast.LENGTH_SHORT).show()
             //TODO(캡처 화면 DB에 저장하기)
-            //saveImageinMongod(screenBitmap)
+            saveImageinMongod(screenShot, webToonTitle)
         }
 
     }
 
-    fun saveImageinMongod(bitmap : Bitmap) {
-        val bitmapString : String? = BitmapToString(bitmap)
-        var jsonTask = SaveImageJSONTask(bitmapString, UniqueID, applicationContext)
-        Log.d("try_login", "let's execute jsonTask")
-        jsonTask.execute(serverip+"/saveImage")
+    fun saveImageinMongod(screenShotFile : File?, webToonTitle: String) {
+        var currentPhotoPath = screenShotFile?.absolutePath
+        var jsonTask = SaveScreenShotJSONTask(currentPhotoPath, UniqueID, webToonTitle, applicationContext)
+        jsonTask.execute(serverip+"/saveScreenShot")
     }
 
     fun BitmapToString(bitmap: Bitmap): String? {
         val baos =
             ByteArrayOutputStream() //바이트 배열을 차례대로 읽어 들이기위한 ByteArrayOutputStream클래스 선언
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos) //bitmap을 압축 (숫자 70은 70%로 압축한다는 뜻)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 70, baos) //bitmap을 압축 (숫자 70은 70%로 압축한다는 뜻)
         val bytes = baos.toByteArray() //해당 bitmap을 byte배열로 바꿔준다.
         return Base64.encodeToString(bytes, Base64.DEFAULT) //String을 retrurn
     }
 
-    fun shot(view:View) : Bitmap {
+    fun ScreenShot(view: View) : File? {
         view.isDrawingCacheEnabled = true
         var screenBitmap : Bitmap = view.getDrawingCache()
-        return screenBitmap
-    }
-
-    fun ScreenShot(screenBitmap : Bitmap) : File? {
         val currentDateTime = Calendar.getInstance().time
         var dateFormat : String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.KOREA).format(currentDateTime)
         var filename : String = dateFormat + ".png"
@@ -102,6 +96,7 @@ class ShowEpisode: AppCompatActivity() {
             e.printStackTrace()
             return null
         }
+        view.isDrawingCacheEnabled = false
         return file
     }
 
@@ -133,17 +128,19 @@ class ShowEpisode: AppCompatActivity() {
     }
 
     @Suppress("DEPRECATION")
-    inner class SaveImageJSONTask(bitmapString : String?, UniqueID : String, mContext : Context?) : AsyncTask<String?, String?, String?>() {
-        var bitmapString = bitmapString
+    inner class SaveScreenShotJSONTask(capturePhotoPath : String?, UniqueID : String, webToonTitle: String, mContext : Context?) : AsyncTask<String?, String?, String?>() {
+        var capturePhotoPath = capturePhotoPath
         var UniqueID = UniqueID
         var mContext = mContext
+        var webToonTitle = webToonTitle
 
         override fun doInBackground(vararg params: String?): String? {
             try {
                 var jsonObject = JSONObject()
                 //입력해둔 edittext의 id와 pw값을 받아와 put해줍니다 : 데이터를 json형식으로 바꿔 넣어주었습니다.
                 jsonObject.accumulate("_id", UniqueID)
-                jsonObject.accumulate("imageBitmap", bitmapString)
+                jsonObject.accumulate("captureUri", capturePhotoPath)
+                jsonObject.accumulate("webToonTitle", webToonTitle)
                 var con: HttpURLConnection? = null
                 var reader: BufferedReader? = null
                 Log.d("JSONTask", "in 1st try")

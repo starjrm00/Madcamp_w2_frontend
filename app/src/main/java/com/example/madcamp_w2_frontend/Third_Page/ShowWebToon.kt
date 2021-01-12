@@ -25,12 +25,14 @@ class ShowWebToon: AppCompatActivity() {
     lateinit var episodeRecycler : RecyclerView
     var epiList : MutableList<Episode> = ArrayList()
     lateinit var uniqueID : String
+    lateinit var webToonTitle : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.one_webtoon_list)
         var site : String = intent.getStringExtra("site")!!
         var link : String = intent.getStringExtra("link" )!!
+        webToonTitle = intent.getStringExtra("webToonTitle")!!
         uniqueID = intent.getStringExtra("uniqueID")!!
         if (site == "Naver") {
             getNaverEpiList().execute(link)
@@ -66,7 +68,7 @@ class ShowWebToon: AppCompatActivity() {
                 }
 
                 for (index in titleList.indices) {
-                    epiList.add(Episode(titleList[index], imageList[index], linkList[index], "Naver"))
+                    epiList.add(Episode(titleList[index], imageList[index], linkList[index], "Naver", webToonTitle))
                 }
 
             } catch (e: IOException) {
