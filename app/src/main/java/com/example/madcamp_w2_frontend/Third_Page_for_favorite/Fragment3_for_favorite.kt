@@ -3,15 +3,15 @@ package com.example.madcamp_w2_frontend
 import android.os.AsyncTask
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
+import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.madcamp_w2_frontend.Third_Page.WebToonAdapter_for_favorite
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -20,8 +20,9 @@ import org.jsoup.select.Elements
 import android.view.Window
 import android.widget.Button
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.example.madcamp_w2_frontend.Third_Page.WebToon
-import com.example.madcamp_w2_frontend.Third_Page.WebToonAdapter
 import com.facebook.AccessToken
 import com.facebook.login.LoginManager
 import kotlinx.android.synthetic.main.fragment_3.*
@@ -31,63 +32,30 @@ import java.net.MalformedURLException
 import java.net.URL
 
 
-class Fragment3(UniqueID: String) : Fragment() {
+class Fragment3_for_favorite() : AppCompatActivity() {
     val serverip = "http://192.249.18.212:3000"
     var webToonList : MutableList<WebToon> = ArrayList()
     var favorite = ArrayList<String>()
     lateinit var imageRecycler : RecyclerView
-    val UniqueID = UniqueID
-
-    private lateinit var callback: OnBackPressedCallback
+    lateinit var UniqueID:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        JSONTask_get_favorite(requireContext(), UniqueID).execute(serverip+"/get_favorite")
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        var bundle = intent.extras
+        UniqueID = bundle!!.getString("UniqueID").toString()
 
-        btn_favorite.setOnClickListener{
-            val intent = Intent(requireContext(), Fragment3_for_favorite::class.java)
-            val bundle = Bundle()
-            bundle.putString("UniqueID", UniqueID)
-            intent.putExtras(bundle)
-            startActivity(intent)
-        }
+        JSONTask_get_favorite(applicationContext, UniqueID).execute(serverip+"/get_favorite")
+        setContentView(R.layout.fragment_3_for_favorite)
 
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_3, container, false)
         val naverComic = "https://comic.naver.com/webtoon/weekday.nhn"
         getNaverData().execute(naverComic)
 
-        //Daum Webtoon
-        /*
-        val week : Array<String> = arrayOf("mon", "tue", "wed", "thu", "fri", "sat", "sun")
-        val daumComic = "http://webtoon.daum.net/#day="
-        for (day in week) {
-            val daumUrl = daumComic + day + "&tab=day"
-            getDaumData().execute(daumUrl)
-        }*/
-
-        //Lezhin Webtoon
-        /*
-        val lezhinComic = "https://www.lezhin.com/ko/scheduled?day=1"
-        getLezhinData().execute(lezhinComic)
-        */
-
-        imageRecycler = rootView.findViewById(R.id.webtoon_image_for_favorite) as RecyclerView
-        imageRecycler.layoutManager = GridLayoutManager(this.context, 3)
-        imageRecycler.adapter = WebToonAdapter(webToonList, UniqueID, context)
+        imageRecycler = findViewById(R.id.webtoon_image_for_favorite)
+        imageRecycler.layoutManager = GridLayoutManager(applicationContext, 3)
+        imageRecycler.adapter = WebToonAdapter_for_favorite(webToonList, UniqueID, applicationContext)
         imageRecycler.setHasFixedSize(true)
-        return rootView
     }
-
 
     @Suppress("DEPRECATION")
     inner class getNaverData : AsyncTask<String?, Void?, String?>() {
@@ -123,13 +91,7 @@ class Fragment3(UniqueID: String) : Fragment() {
                     if(titleList[index] in favorite){
                         webToonList.add(WebToon("Naver", titleList[index], imageList[index], linkList[index], true))
                     }
-                    else{
-                        webToonList.add(WebToon("Naver", titleList[index], imageList[index], linkList[index], false))
-                    }
                 }
-
-
-
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -138,8 +100,8 @@ class Fragment3(UniqueID: String) : Fragment() {
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
-            imageRecycler.layoutManager = GridLayoutManager(context, 3)
-            imageRecycler.adapter = WebToonAdapter(webToonList, UniqueID, context)
+            imageRecycler.layoutManager = GridLayoutManager(applicationContext, 3)
+            imageRecycler.adapter = WebToonAdapter_for_favorite(webToonList, UniqueID, applicationContext)
         }
     }
 
@@ -173,9 +135,6 @@ class Fragment3(UniqueID: String) : Fragment() {
                 for (index in titleList.indices) {
                     if(titleList[index] in favorite){
                         webToonList.add(WebToon("Daum", titleList[index], imageList[index], linkList[index], true))
-                    }
-                    else{
-                        webToonList.add(WebToon("Daum", titleList[index], imageList[index], linkList[index], false))
                     }
                 }
             } catch (e: IOException) {
@@ -255,40 +214,5 @@ class Fragment3(UniqueID: String) : Fragment() {
 
             Log.d("favorite List", favorite.toString())
         }
-    }
-
-
-    //logout
-    //override fun onMapReady(p0: GoogleMap?) {}
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                var logout_dialog = Dialog(context)
-                logout_dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-                val inflater = LayoutInflater.from(context)
-                val dialogView = inflater.inflate(R.layout.logout, null)
-                logout_dialog.setContentView(dialogView)
-                logout_dialog.show()
-                var logout_btn: Button = dialogView.findViewById(R.id.logout_accept)
-                var cancel_btn: Button = dialogView.findViewById(R.id.logout_denied)
-
-                logout_btn.setOnClickListener{
-                    if(AccessToken.getCurrentAccessToken() != null) {
-                        LoginManager.getInstance().logOut()
-                    }
-                    activity?.finish()
-                }
-                cancel_btn.setOnClickListener{
-                    logout_dialog.dismiss()
-                }
-            }
-        }
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        callback.remove()
     }
 }

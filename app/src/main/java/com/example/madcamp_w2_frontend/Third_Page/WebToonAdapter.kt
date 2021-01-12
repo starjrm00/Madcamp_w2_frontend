@@ -2,28 +2,21 @@ package com.example.madcamp_w2_frontend.Third_Page
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.AsyncTask
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.madcamp_w2_frontend.Fragment3
 import com.example.madcamp_w2_frontend.R
-import com.example.madcamp_w2_frontend.list_item
 import org.json.JSONObject
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
-import kotlin.reflect.jvm.internal.impl.util.Check
 
 class WebToonAdapter(val WebToonList:MutableList<WebToon>, val UniqueID : String, val context : Context?):
     RecyclerView.Adapter<WebToonAdapter.viewHolder>(){
